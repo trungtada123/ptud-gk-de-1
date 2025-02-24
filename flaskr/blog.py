@@ -92,13 +92,15 @@ def update(id):
 @bp.route('/<int:id>/delete', methods=('POST',))
 @login_required
 def delete_post(id):
-    if g.user is None or g.user['is_admin'] == 0:  # Kiểm tra quyền admin
-        abort(403)
+    post = get_post(id, check_author=False)  # Kiểm tra quyền tác giả
+    # Kiểm tra xem người dùng có quyền xóa bài viết
+    if g.user is None or (g.user['is_admin'] == 0 and post['author_id'] != g.user['id']):
+        abort(403)  # Nếu không có quyền, trả về lỗi 403
     db = get_db()
     db.execute('DELETE FROM post WHERE id = ?', (id,))
     db.commit()
     flash('Post has been deleted.', 'success')
-    return redirect(url_for('blog.admin_posts'))
+    return redirect(url_for('blog.index'))  # Chuyển hướng đến trang blog chính
 
 @bp.route('/admin')
 @login_required
@@ -130,6 +132,7 @@ def unblock_user(user_id):
     flash('User has been unblocked.', 'success')
     return redirect(url_for('blog.admin'))
 
+# flask-tiny-app/flaskr/blog.py
 @bp.route('/admin/posts')
 @login_required
 def admin_posts():
@@ -140,7 +143,7 @@ def admin_posts():
         ' FROM post p JOIN user u ON p.author_id = u.id'
         ' ORDER BY created DESC'
     ).fetchall()
-    return render_template('admin_posts.html', posts=posts)
+    return render_template('admin_posts.html', posts=posts)  # Đảm bảo rằng trang này hiển thị các bài viết
 
 def generate_random_password(length=8):
     characters = string.ascii_letters + string.digits
