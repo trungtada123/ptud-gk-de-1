@@ -4,7 +4,9 @@ DROP TABLE IF EXISTS post;
 CREATE TABLE user (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   username TEXT UNIQUE NOT NULL,
-  password TEXT NOT NULL
+  password TEXT NOT NULL,
+  is_blocked BOOLEAN NOT NULL DEFAULT 0,  -- Thêm thuộc tính is_blocked
+  is_admin BOOLEAN NOT NULL DEFAULT 0      -- Thêm thuộc tính is_admin
 );
 
 CREATE TABLE post (

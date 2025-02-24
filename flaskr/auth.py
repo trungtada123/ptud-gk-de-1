@@ -1,10 +1,9 @@
+# flask-tiny-app/flaskr/auth.py
 import functools
-
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for
 )
 from werkzeug.security import check_password_hash, generate_password_hash
-
 from flaskr.db import get_db
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
@@ -25,8 +24,8 @@ def register():
         if error is None:
             try:
                 db.execute(
-                    "INSERT INTO user (username, password) VALUES (?, ?)",
-                    (username, generate_password_hash(password)),
+                    "INSERT INTO user (username, password, is_admin) VALUES (?, ?, ?)",
+                    (username, generate_password_hash(password), 0),  # Tạo tài khoản không phải admin
                 )
                 db.commit()
             except db.IntegrityError:
@@ -54,10 +53,16 @@ def login():
         elif not check_password_hash(user['password'], password):
             error = 'Incorrect password.'
 
+        if user and user['is_blocked']:
+            flash('Your account has been blocked.', 'danger')
+            return redirect(url_for('auth.login'))
+
         if error is None:
             session.clear()
             session['user_id'] = user['id']
-            return redirect(url_for('index'))
+            if user['is_admin']:  # Kiểm tra xem người dùng có phải là admin không
+                return redirect(url_for('blog.admin'))  # Chuyển đến trang admin
+            return redirect(url_for('index'))  # Chuyển đến trang chính cho người dùng bình thường
 
         flash(error)
 
@@ -72,7 +77,7 @@ def load_logged_in_user():
     else:
         g.user = get_db().execute(
             'SELECT * FROM user WHERE id = ?', (user_id,)
-        ).fetchone()
+        ).fetchone()  # fetchone() trả về một sqlite3.Row
 
 @bp.route('/logout')
 def logout():
@@ -88,4 +93,3 @@ def login_required(view):
         return view(**kwargs)
 
     return wrapped_view
-
