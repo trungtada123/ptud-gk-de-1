@@ -18,3 +18,7 @@ python -m venv venv
 source venv/bin/activate  # Hoặc venv\Scripts\activate trên Windows
 pip install -r requirements.txt
 python app.py
+
+# Khởi tạo cơ sở dữ liệu để lưu trữ thông tin tài khoản và bài viết
+flask --app flaskr init-db
+
