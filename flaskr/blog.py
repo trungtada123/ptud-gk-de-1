@@ -15,7 +15,7 @@ bp = Blueprint('blog', __name__)
 def index():
     db = get_db()
     posts = db.execute(
-        'SELECT p.id, title, body, created, author_id, username'
+        'SELECT p.id, title, body, created, author_id, username, u.is_admin'  # Thêm u.is_admin vào truy vấn
         ' FROM post p JOIN user u ON p.author_id = u.id'
         ' ORDER BY created DESC'
     ).fetchall()
@@ -132,14 +132,13 @@ def unblock_user(user_id):
     flash('User has been unblocked.', 'success')
     return redirect(url_for('blog.admin'))
 
-# flask-tiny-app/flaskr/blog.py
 @bp.route('/admin/posts')
 @login_required
 def admin_posts():
     if g.user is None or g.user['is_admin'] == 0:  # Kiểm tra quyền admin
         abort(403)
     posts = get_db().execute(
-        'SELECT p.id, title, body, created, author_id, username'
+        'SELECT p.id, title, body, created, author_id, username, is_admin'  # Thêm cột is_admin
         ' FROM post p JOIN user u ON p.author_id = u.id'
         ' ORDER BY created DESC'
     ).fetchall()
@@ -161,3 +160,50 @@ def reset_password(user_id):
     db.commit()
     flash('Password has been reset. New password: ' + new_password, 'success')
     return redirect(url_for('blog.admin'))
+
+@bp.route('/delete_multiple', methods=('POST',))
+@login_required
+def delete_multiple_posts():
+    post_ids = request.form.getlist('post_ids')  # Lấy danh sách ID bài viết từ form
+    if not post_ids:
+        flash('No posts selected for deletion.', 'warning')
+        return redirect(url_for('blog.my_posts'))  # Chuyển hướng về trang quản lý bài viết của người dùng
+
+    # Kiểm tra quyền xóa bài viết
+    for post_id in post_ids:
+        post = get_post(post_id, check_author=False)
+        if g.user is None or (g.user['is_admin'] == 0 and post['author_id'] != g.user['id']):
+            abort(403)  # Nếu không có quyền, trả về lỗi 403
+
+    db = get_db()
+    db.execute('DELETE FROM post WHERE id IN ({})'.format(','.join('?' * len(post_ids))), post_ids)
+    db.commit()
+    flash('Selected posts have been deleted.', 'success')
+    return redirect(url_for('blog.my_posts'))  # Chuyển hướng về trang quản lý bài viết của người dùng
+
+@bp.route('/my_posts')
+@login_required
+def my_posts():
+    db = get_db()
+    posts = db.execute(
+        'SELECT p.id, title, body, created, author_id, username'
+        ' FROM post p JOIN user u ON p.author_id = u.id'
+        ' WHERE p.author_id = ?'
+        ' ORDER BY created DESC',
+        (g.user['id'],)
+    ).fetchall()
+    return render_template('blog/my_posts.html', posts=posts)
+
+@bp.route('/admin/my_posts')
+@login_required
+def admin_my_posts():
+    if g.user is None or g.user['is_admin'] == 0:  # Kiểm tra quyền admin
+        abort(403)
+    posts = get_db().execute(
+        'SELECT p.id, title, body, created, author_id, username'
+        ' FROM post p JOIN user u ON p.author_id = u.id'
+        ' WHERE u.id = ?'
+        ' ORDER BY created DESC',
+        (g.user['id'],)
+    ).fetchall()
+    return render_template('blog/admin_my_posts.html', posts=posts)

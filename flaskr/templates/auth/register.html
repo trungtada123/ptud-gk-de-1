@@ -1,16 +1,15 @@
-<!-- flask-tiny-app/flaskr/templates/auth/register.html -->
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}Register{% endblock %}</h1>
+  <h1>{% block title %}Đăng Ký{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
-  <form method="post">
-    <label for="username">Username</label>
+  <form method="post" class="form">
+    <label for="username">Tên người dùng</label>
     <input name="username" id="username" required>
-    <label for="password">Password</label>
+    <label for="password">Mật khẩu</label>
     <input type="password" name="password" id="password" required>
-    <input type="submit" value="Register">
+    <input type="submit" value="Đăng Ký" class="btn">
   </form>
 {% endblock %}

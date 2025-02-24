@@ -1,28 +1,35 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}Posts{% endblock %}</h1>
+  <h1>{% block title %}Bài Viết{% endblock %}</h1>
   {% if g.user %}
-    <a class="action" href="{{ url_for('blog.create') }}">New</a>
+    <div class="user-actions">
+      <a class="action" href="{{ url_for('blog.create') }}">Tạo Bài Viết</a>
+      <a class="action" href="{{ url_for('blog.my_posts') }}">Quản Lý Bài Viết</a>
+      {% if g.user['is_admin'] %}
+        <a class="action" href="{{ url_for('blog.admin') }}">Quay Về Bảng Quản Trị</a>
+      {% endif %}
+    </div>
   {% endif %}
 {% endblock %}
 
 {% block content %}
-  {% for post in posts %}
-    <article class="post">
-      <header>
-        <div>
-          <h1>{{ post['title'] }}</h1>
-          <div class="about">by {{ post['username'] }} on {{ post['created'].strftime('%Y-%m-%d') }}</div>
-        </div>
-        {% if g.user['id'] == post['author_id'] %}
-          <a class="action" href="{{ url_for('blog.update', id=post['id']) }}">Edit</a>
-        {% endif %}
-      </header>
-      <p class="body">{{ post['body'] }}</p>
-    </article>
-    {% if not loop.last %}
-      <hr>
-    {% endif %}
-  {% endfor %}
+  <div class="post-list">
+    {% for post in posts %}
+      <article class="post {% if post.is_admin %}admin{% endif %}">  <!-- Đảm bảo rằng lớp admin được thêm vào -->
+        <header>
+          <h2>{{ post['title'] }}</h2>
+          <div class="about">Bởi {{ post['username'] }} vào {{ post['created'].strftime('%Y-%m-%d') }}</div>
+        </header>
+        <p class="body">{{ post['body'] }}</p>
+        <footer>
+          {% if g.user and g.user['id'] == post['author_id'] %}
+            <a class="btn edit" href="{{ url_for('blog.update', id=post['id']) }}">
+              <i class="fas fa-edit"></i> Chỉnh Sửa
+            </a>
+          {% endif %}
+        </footer>
+      </article>
+    {% endfor %}
+  </div>
 {% endblock %}

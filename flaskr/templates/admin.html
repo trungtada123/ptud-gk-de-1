@@ -1,4 +1,3 @@
-<!-- flask-tiny-app/flaskr/templates/admin.html -->
 {% extends 'base.html' %}
 
 {% block header %}
@@ -7,19 +6,25 @@
 
 {% block content %}
   <h2>User Management</h2>
-  <a href="{{ url_for('blog.admin_posts') }}">Manage Blog Posts</a>  <!-- Thêm nút này -->
-  {% for user in users %}
-    <div>
-      <p>{{ user.username }} - {{ 'Blocked' if user.is_blocked else 'Active' }}</p>
-      <form action="{{ url_for('blog.block_user', user_id=user.id) }}" method="post">
-        <button type="submit" {% if user.is_blocked %}disabled{% endif %}>Block User</button>
-      </form>
-      <form action="{{ url_for('blog.unblock_user', user_id=user.id) }}" method="post">
-        <button type="submit" {% if not user.is_blocked %}disabled{% endif %}>Unblock User</button>
-      </form>
-      <form action="{{ url_for('blog.reset_password', user_id=user.id) }}" method="post">
-        <button type="submit">Reset Password</button>
-      </form>
-    </div>
-  {% endfor %}
+  <div class="admin-actions">
+    <a class="action" href="{{ url_for('blog.admin_posts') }}">Manage Blog Posts</a>
+    <a class="action" href="{{ url_for('blog.admin_my_posts') }}">Manage My Posts</a>  <!-- Nút vào trang quản lý bài viết của admin -->
+    <a class="action" href="{{ url_for('blog.index') }}">To Blog</a>  <!-- Nút chuyển đến trang blog chính -->
+  </div>
+  <div class="user-list">
+    {% for user in users %}
+      <div class="user-item">
+        <p>{{ user.username }} - {{ 'Blocked' if user.is_blocked else 'Active' }}</p>
+        <form action="{{ url_for('blog.block_user', user_id=user.id) }}" method="post">
+          <button type="submit" {% if user.is_blocked %}disabled{% endif %}>Block User</button>
+        </form>
+        <form action="{{ url_for('blog.unblock_user', user_id=user.id) }}" method="post">
+          <button type="submit" {% if not user.is_blocked %}disabled{% endif %}>Unblock User</button>
+        </form>
+        <form action="{{ url_for('blog.reset_password', user_id=user.id) }}" method="post">
+          <button type="submit">Reset Password</button>
+        </form>
+      </div>
+    {% endfor %}
+  </div>
 {% endblock %}
