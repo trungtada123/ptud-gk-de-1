@@ -4,8 +4,6 @@
 - Họ tên 1: Nguyễn Chí Trung
 - Mã sinh viên 1: 22719231
 
-- Họ tên 2: Nguyễn Trường Vương
-- Mã sinh viên 2: 22642961 
 
 ## Mô tả
 Ứng dụng web quản lý bài viết/to-do list đơn giản bằng Flask.
