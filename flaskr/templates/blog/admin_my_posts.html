@@ -1,23 +1,28 @@
 {% extends 'base.html' %}
+{% block title %}Admin's Posts{% endblock %}
 
 {% block header %}
-  <h1>{% block title %}Admin's Posts{% endblock %}</h1>
+  <h1>Admin's Posts</h1>
 {% endblock %}
 
 {% block content %}
+<section class="admin-section">
   <h2>Manage My Posts</h2>
-  <form action="{{ url_for('blog.delete_multiple_posts') }}" method="post">
+  <form action="{{ url_for('blog.delete_multiple_posts') }}" method="post" class="form-list">
     {% for post in posts %}
-      <div style="color: red;">  <!-- Nổi bật bài viết của admin -->
+      <div class="post-item admin">
         <h3>{{ post.title }}</h3>
         <p>{{ post.body }}</p>
         <input type="checkbox" name="post_ids" value="{{ post.id }}">
-        <a href="{{ url_for('blog.update', id=post.id) }}">Edit</a>
+        <a class="btn" href="{{ url_for('blog.update', id=post.id) }}">Edit</a>
       </div>
       <hr>
     {% endfor %}
-    <input class="danger" type="submit" value="Delete Selected" onclick="return confirm('Are you sure you want to delete the selected posts?');">
+    <input class="btn danger" type="submit" value="Delete Selected" onclick="return confirm('Are you sure you want to delete the selected posts?');">
   </form>
-  <a href="{{ url_for('blog.admin') }}">Back to Admin Panel</a>  <!-- Nút quay lại admin panel -->
-  <a href="{{ url_for('blog.index') }}">Back to Blog</a>  <!-- Nút quay lại blog -->
+  <div class="navigation-links">
+    <a class="btn" href="{{ url_for('blog.admin') }}">Back to Admin Panel</a>
+    <a class="btn" href="{{ url_for('blog.index') }}">Back to Blog</a>
+  </div>
+</section>
 {% endblock %}

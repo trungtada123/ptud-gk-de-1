@@ -1,33 +1,37 @@
 <!doctype html>
 <html lang="vi">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>{% block title %}{% endblock %} - THE BLOG</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{% endblock %} - T BLOG</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
 <nav>
-  <h1>THE BLOG</h1>
-  <ul>
-    {% if g.user %}
-      <li><span>{{ g.user['username'] }}</span></li>
-      <li><a href="{{ url_for('auth.logout') }}">Đăng Xuất</a></li>
-    {% else %}
-      <li><a href="{{ url_for('auth.register') }}">Đăng Ký</a></li>
-      <li><a href="{{ url_for('auth.login') }}">Đăng Nhập</a></li>
-    {% endif %}
-  </ul>
+    <div class="nav-left">
+        <h1><a href="{{ url_for('blog.index') }}">T BLOG</a></h1>
+    </div>
+    <div class="nav-right">
+        <ul>
+            {% if g.user %}
+                <li><span class="username">{{ g.user['username'] }}</span></li>
+                <li><a href="{{ url_for('auth.logout') }}">Đăng Xuất</a></li>
+            {% else %}
+                <li><a href="{{ url_for('auth.register') }}">Đăng Ký</a></li>
+                <li><a href="{{ url_for('auth.login') }}">Đăng Nhập</a></li>
+            {% endif %}
+        </ul>
+    </div>
 </nav>
 <section class="content">
-  <header>
-    {% block header %}{% endblock %}
-  </header>
-  {% for message in get_flashed_messages() %}
-    <div class="flash">{{ message }}</div>
-  {% endfor %}
-  {% block content %}{% endblock %}
+    <header>
+        {% block header %}{% endblock %}
+    </header>
+    {% for message in get_flashed_messages() %}
+        <div class="flash">{{ message }}</div>
+    {% endfor %}
+    {% block content %}{% endblock %}
 </section>
 </body>
 </html>

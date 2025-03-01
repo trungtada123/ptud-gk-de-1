@@ -33,7 +33,7 @@ def init_db():
     if admin_user is None:
         db.execute(
             "INSERT INTO user (username, password, is_admin) VALUES (?, ?, ?)",
-            ('admin', generate_password_hash('admin_password'), 1)  # Mật khẩu mặc định
+            ('admin', generate_password_hash('trungtada123'), 1)  # Mật khẩu mặc định là trungtada123123
         )
         db.commit()
 

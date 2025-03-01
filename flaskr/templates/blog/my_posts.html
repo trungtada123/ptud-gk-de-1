@@ -1,22 +1,27 @@
 {% extends 'base.html' %}
+{% block title %}My Posts{% endblock %}
 
 {% block header %}
-  <h1>{% block title %}My Posts{% endblock %}</h1>
+    <h1>My Posts</h1>
 {% endblock %}
 
 {% block content %}
-  <h2>Manage My Posts</h2>
-  <form action="{{ url_for('blog.delete_multiple_posts') }}" method="post">
-    {% for post in posts %}
-      <div>
-        <h3>{{ post.title }}</h3>
-        <p>{{ post.body }}</p>
-        <input type="checkbox" name="post_ids" value="{{ post.id }}">
-        <a href="{{ url_for('blog.update', id=post.id) }}">Edit</a>
-      </div>
-      <hr>
-    {% endfor %}
-    <input class="danger" type="submit" value="Delete Selected" onclick="return confirm('Are you sure you want to delete the selected posts?');">
-  </form>
-  <a href="{{ url_for('blog.index') }}">Back to Blog</a>  <!-- Nút quay lại blog -->
+<section class="user-posts">
+    <h2>Manage My Posts</h2>
+    <form action="{{ url_for('blog.delete_multiple_posts') }}" method="post" class="form-list">
+        {% for post in posts %}
+        <div class="post-item">
+            <h3>{{ post.title }}</h3>
+            <p>{{ post.body }}</p>
+            <input type="checkbox" name="post_ids" value="{{ post.id }}">
+            <a class="btn" href="{{ url_for('blog.update', id=post.id) }}">Edit</a>
+        </div>
+        <hr>
+        {% endfor %}
+        <input class="btn danger" type="submit" value="Delete Selected" onclick="return confirm('Are you sure you want to delete the selected posts?');">
+    </form>
+    <div class="navigation-links">
+        <a class="btn" href="{{ url_for('blog.index') }}">Back to Blog</a>
+    </div>
+</section>
 {% endblock %}

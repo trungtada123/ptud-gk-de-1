@@ -1,219 +1,179 @@
-/* Cài đặt chung cho body */
+/* Reset và thiết lập cơ bản */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    background: #f4f4f4;
-    margin: 0;
-    padding: 0;
-}
-
-/* Cài đặt cho thanh điều hướng */
-nav {
-    background: #007bff;
-    color: white;
-    padding: 1rem;
-}
-
-nav h1 {
-    margin: 0;
-}
-
-nav ul {
-    list-style: none;
-    padding: 0;
-}
-
-nav ul li {
-    display: inline;
-    margin-right: 1rem;
-}
-
-/* Cài đặt cho nội dung chính */
-.content {
-    max-width: 800px;
-    margin: 20px auto;
-    background: white;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-/* Cài đặt cho tiêu đề */
-h1, h2 {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    background-color: #f4f4f4;
     color: #333;
 }
 
-/* Cài đặt cho các hành động của người dùng */
-.user-actions {
-    margin-bottom: 20px;
-}
-
-.user-actions .action {
-    display: inline-block;
-    margin-right: 10px;
-    padding: 10px 15px;
-    background-color: #007bff;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    transition: background 0.3s;
-}
-
-.user-actions .action:hover {
-    background-color: #0056b3;
-}
-
-/* Cài đặt cho danh sách bài viết */
-.post-list {
+/* Thanh điều hướng với chủ đề xanh đen sang trọng */
+nav {
+    background: #2C3E50; /* Sắc thái xanh đen */
+    color: #fff;
+    padding: 1rem;
     display: flex;
-    flex-direction: column;
-    gap: 20px; /* Khoảng cách giữa các bài viết */
-}
-
-.post {
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 15px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.post.admin {
-    border: 2px solid red; /* Viền đỏ cho bài viết của admin */
-    background-color: #ffe6e6; /* Màu nền nhạt cho bài viết của admin */
-    color: red; /* Chữ đỏ cho bài viết của admin */
-}
-
-/* Cài đặt cho tiêu đề bài viết */
-.post header {
-    margin-bottom: 10px;
-}
-
-.post h2 {
-    margin: 0;
-    font-size: 1.5em;
-}
-
-/* Cài đặt cho thông tin về tác giả */
-.about {
-    color: slategray;
-    font-size: 0.9em;
-    margin-bottom: 10px;
-}
-
-/* Cài đặt cho nội dung bài viết */
-.body {
-    margin-bottom: 10px;
-}
-
-/* Cài đặt cho footer */
-footer {
-    display: flex;
-    justify-content: flex-end;
-}
-
-/* Cài đặt cho nút bấm */
-.btn {
-    display: inline-flex;
+    justify-content: space-between;
     align-items: center;
-    background: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
+}
+
+nav .nav-left h1 a {
+    color: #fff;
     text-decoration: none;
-    transition: background 0.3s;
+}
+
+nav .nav-right ul {
+    list-style: none;
+    display: flex;
+}
+
+nav .nav-right ul li {
+    margin-left: 1rem;
+}
+
+nav .nav-right ul li a {
+    color: #fff;
+    text-decoration: none;
+}
+
+/* Khung nội dung chính */
+.content {
+    max-width: 800px;
+    margin: 2rem auto;
+    background: #fff;
+    padding: 1.5rem;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+header {
+    margin-bottom: 1rem;
+}
+
+h1, h2, h3 {
+    margin-bottom: 1rem;
+}
+
+/* Các form và input */
+.form {
+    margin-bottom: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.form-group input[type="text"],
+.form-group input[type="password"],
+.form-group input[type="email"],
+.form-group textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Các nút bấm */
+.btn {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: #2C3E50;  /* Nút bấm theo chủ đề */
+    color: #fff;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
 }
 
 .btn:hover {
-    background: #0056b3;
+    background: #1A242F; /* Sắc thái tối hơn khi hover */
 }
 
-.edit {
-    background: #28a745; /* Màu xanh cho nút chỉnh sửa */
+.btn.danger {
+    background: #E74C3C; /* Nút bấm hành động nguy hiểm */
 }
 
-.edit:hover {
-    background: #218838;
+.btn.danger:hover {
+    background: #c0392b;
 }
 
-.btn i {
-    margin-right: 5px; /* Khoảng cách giữa biểu tượng và văn bản */
+/* Các nhóm điều hướng và hành động */
+.user-actions, .navigation-links, .admin-actions {
+    margin-top: 1rem;
 }
 
-/* Cài đặt cho thông báo */
+.user-actions a,
+.navigation-links a,
+.admin-actions a {
+    margin-right: 0.5rem;
+}
+
+/* Hiển thị bài viết */
+.post-list article {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* Bài viết của admin: nổi bật với viền đỏ và chữ đỏ trên nền nhẹ */
+.post-list article.admin,
+.post-item.admin {
+    border: 2px solid #E74C3C; /* Viền nổi bật đỏ */
+    color: #E74C3C;           /* Chữ đỏ */
+    background-color: #FDECEC; /* Nền nhẹ đỏ hồng */
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* Bài viết thông thường */
+.post-list article:not(.admin) {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: #fdfdfd;
+}
+
+/* Thông báo */
 .flash {
-    padding: 10px;
-    margin-bottom: 20px;
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-    border-radius: 5px;
+    background: #FFC107;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
 }
 
-/* Cài đặt cho danh sách người dùng */
-.user-list {
-    margin-top: 20px;
+/* Các form hiển thị dạng inline */
+.inline-form {
+    display: inline-block;
+    margin-right: 0.5rem;
+}
+
+/* Các khu vực dành cho admin và người dùng */
+.admin-section,
+.user-posts {
+    padding: 1rem;
+}
+
+.post-item {
+    padding: 1rem;
+    background: #f9f9f9;
+    border-radius: 4px;
+    margin-bottom: 1rem;
 }
 
 .user-item {
+    padding: 1rem;
+    background: #f9f9f9;
     border: 1px solid #ccc;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-}
-
-/* Cài đặt cho các hành động của admin */
-.admin-actions {
-    margin-bottom: 20px;
-}
-
-.admin-actions .action {
-    display: inline-block;
-    margin-right: 10px;
-    padding: 10px 15px;
-    background-color: #007bff;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    transition: background 0.3s;
-}
-
-.admin-actions .action:hover {
-    background-color: #0056b3;
-}
-
-/* Cài đặt cho form */
-.form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px; /* Khoảng cách giữa các trường nhập liệu */
-}
-
-.form label {
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-.form input[type="text"],
-.form input[type="password"],
-.form textarea {
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    width: 100%; /* Đặt chiều rộng 100% để chiếm toàn bộ không gian */
-    box-sizing: border-box; /* Đảm bảo padding không làm tăng chiều rộng */
-}
-
-.form textarea {
-    min-height: 200px; /* Đặt chiều cao tối thiểu cho textarea */
-    resize: vertical; /* Cho phép người dùng thay đổi kích thước theo chiều dọc */
-}
-
-.danger {
-    background: #cc2f2e;
-}
-
-.danger:hover {
-    background: #b02a2a;
+    border-radius: 4px;
+    margin-bottom: 1rem;
 }
