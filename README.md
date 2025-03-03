@@ -37,3 +37,9 @@ flask --app flaskr init-db
 
 Bước 7: Run app
 flask --app flaskr run --debug
+
+
+
+Hoặc cũng có thể chạy tự động bằng docker
+B1: docker build -t flask-tiny-app .
+B2: docker run -p 5000:5000 flask-tiny-app
