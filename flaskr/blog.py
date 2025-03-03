@@ -11,15 +11,25 @@ import string
 
 bp = Blueprint('blog', __name__)
 
-@bp.route('/')
-def index():
+@bp.route('/', defaults={'page': 1})
+@bp.route('/page/<int:page>')
+def index(page):
     db = get_db()
+    per_page = 10  # Số bài viết mỗi trang
+    offset = (page - 1) * per_page  # Tính toán offset
+
     posts = db.execute(
-        'SELECT p.id, title, body, created, author_id, username, u.is_admin'  # Thêm u.is_admin vào truy vấn
+        'SELECT p.id, title, body, created, author_id, username, u.is_admin'
         ' FROM post p JOIN user u ON p.author_id = u.id'
         ' ORDER BY created DESC'
+        ' LIMIT ? OFFSET ?',
+        (per_page, offset)
     ).fetchall()
-    return render_template('blog/index.html', posts=posts)
+
+    total_posts = db.execute('SELECT COUNT(*) FROM post').fetchone()[0]  # Tổng số bài viết
+    total_pages = (total_posts + per_page - 1) // per_page  # Tính số trang
+
+    return render_template('blog/index.html', posts=posts, page=page, total_pages=total_pages)
 
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
@@ -148,7 +158,6 @@ def generate_random_password(length=8):
     characters = string.ascii_letters + string.digits
     return ''.join(random.choice(characters) for _ in range(length))
 
-# flask-tiny-app/flaskr/blog.py
 @bp.route('/admin/reset_password/<int:user_id>', methods=['POST'])
 @login_required
 def reset_password(user_id):
@@ -181,29 +190,48 @@ def delete_multiple_posts():
     flash('Selected posts have been deleted.', 'success')
     return redirect(url_for('blog.my_posts'))  # Chuyển hướng về trang quản lý bài viết của người dùng
 
-@bp.route('/my_posts')
+@bp.route('/my_posts', defaults={'page': 1})
+@bp.route('/my_posts/page/<int:page>')
 @login_required
-def my_posts():
+def my_posts(page):
     db = get_db()
+    per_page = 10  # Số bài viết mỗi trang
+    offset = (page - 1) * per_page  # Tính toán offset
+
     posts = db.execute(
         'SELECT p.id, title, body, created, author_id, username'
         ' FROM post p JOIN user u ON p.author_id = u.id'
         ' WHERE p.author_id = ?'
-        ' ORDER BY created DESC',
-        (g.user['id'],)
+        ' ORDER BY created DESC'
+        ' LIMIT ? OFFSET ?',
+        (g.user['id'], per_page, offset)
     ).fetchall()
-    return render_template('blog/my_posts.html', posts=posts)
 
-@bp.route('/admin/my_posts')
+    total_posts = db.execute('SELECT COUNT(*) FROM post WHERE author_id = ?', (g.user['id'],)).fetchone()[0]  # Tổng số bài viết của người dùng
+    total_pages = (total_posts + per_page - 1) // per_page  # Tính số trang
+
+    return render_template('blog/my_posts.html', posts=posts, page=page, total_pages=total_pages)
+
+@bp.route('/admin/my_posts', defaults={'page': 1})
+@bp.route('/admin/my_posts/page/<int:page>')
 @login_required
-def admin_my_posts():
+def admin_my_posts(page):
     if g.user is None or g.user['is_admin'] == 0:  # Kiểm tra quyền admin
         abort(403)
-    posts = get_db().execute(
+    db = get_db()
+    per_page = 10  # Số bài viết mỗi trang
+    offset = (page - 1) * per_page  # Tính toán offset
+
+    posts = db.execute(
         'SELECT p.id, title, body, created, author_id, username'
         ' FROM post p JOIN user u ON p.author_id = u.id'
         ' WHERE u.id = ?'
-        ' ORDER BY created DESC',
-        (g.user['id'],)
+        ' ORDER BY created DESC'
+        ' LIMIT ? OFFSET ?',
+        (g.user['id'], per_page, offset)
     ).fetchall()
-    return render_template('blog/admin_my_posts.html', posts=posts)
+
+    total_posts = db.execute('SELECT COUNT(*) FROM post WHERE author_id = ?', (g.user['id'],)).fetchone()[0]  # Tổng số bài viết của người dùng
+    total_pages = (total_posts + per_page - 1) // per_page  # Tính số trang
+
+    return render_template('blog/admin_my_posts.html', posts=posts, page=page, total_pages=total_pages)

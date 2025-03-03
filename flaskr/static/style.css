@@ -177,3 +177,57 @@ h1, h2, h3 {
     border-radius: 4px;
     margin-bottom: 1rem;
 }
+
+/* Cải thiện giao diện bài viết */
+.post {
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.post h2, .post h3 {
+    color: #2C3E50;
+}
+
+.post .about {
+    font-size: 0.9rem;
+    color: #777;
+}
+
+/* Cải thiện giao diện nút bấm */
+.btn {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: #2C3E50;  /* Nút bấm theo chủ đề */
+    color: #fff;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.btn:hover {
+    background: #1A242F; /* Sắc thái tối hơn khi hover */
+}
+
+.btn.danger {
+    background: #E74C3C; /* Nút bấm hành động nguy hiểm */
+}
+
+.btn.danger:hover {
+    background: #c0392b;
+}
+
+/* Cải thiện giao diện phân trang */
+.pagination {
+    margin: 1rem 0;
+    text-align: center;
+}
+
+.pagination .btn {
+    margin: 0 0.5rem;
+}
