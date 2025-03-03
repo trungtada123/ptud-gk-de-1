@@ -6,7 +6,7 @@
 
 
 ## Mô tả
-Ứng dụng web quản lý bài viết đơn giản bằng Flask.
+Ứng dụng web quản lý bài viết đơn giản bằng Flask bao gồm 2 tác nhân chính là Admin và User. Trong đó Admin có quyền block, unblock, reset mật khẩu cho người dùng. Các bài viết được phân trang theo số lượng bài: 10 bài / trang,....
 
 ## Hướng dẫn cài đặt và chạy
 ```bash
@@ -15,6 +15,12 @@ git clone https://github.com/trungtada123/flask-tiny-app.git
 
 Bước 2: Di chuyển đến thư mục app
 cd flask-tiny-app
+
+
+Bước 3: Có thể dùng lệnh terminal để khởi chạy tự động:
+.\install.bat
+
+Hoặc thực hiệ thủ công như sau:
 
 Bước 3: Tạo môi trường ảo
 python -m venv venv # Tạo môi trường ảo
