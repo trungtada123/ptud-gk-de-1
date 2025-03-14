@@ -14,9 +14,9 @@
 
    git clone https://github.com/trungtada123/ptud-gk-de-1
    
-1.1 Di chuyển đến thư mục chính
-   cd flask-tiny-app
+2. Di chuyển đến thư mục chính
 
+    cd flask-tiny-app
 
 3. Chạy script cài đặt:
 
@@ -34,7 +34,7 @@
    - Khôi phục cơ sở dữ liệu từ bản sao lưu
    - Khôi phục hình ảnh từ thư mục data
 
-6. Chạy ứng dụng:
+5. Chạy ứng dụng:
 
    .\run.bat
 
