@@ -7,13 +7,13 @@ echo =================================================
 if not exist data (
     echo Khong tim thay thu muc data!
     echo Vui long dam bao ban da clone toan bo repository.
-    goto :end
+    goto end
 )
 
 :: Kiểm tra xem có file database backup không
 if not exist data\flaskr.sqlite.backup (
     echo Khong tim thay file database backup!
-    goto :end
+    goto end
 )
 
 :: Tạo thư mục instance nếu chưa tồn tại
@@ -34,7 +34,7 @@ if exist data\images (
 
 echo Da hoan tat khoi phuc du lieu!
 echo.
-echo Bay gio ban co the chay ung dung voi du lieu day du.
+echo Bay gio ban co the chay ung dung voi lenh: run.bat
 
 :end
 pause 
