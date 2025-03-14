@@ -9,6 +9,7 @@ from werkzeug.security import generate_password_hash
 import random
 import string
 import os  # Thêm import os
+import sqlite3
 
 bp = Blueprint('blog', __name__)
 
@@ -137,6 +138,20 @@ def blog_index():
     # Đếm tổng số bài viết
     total_posts = db.execute('SELECT COUNT(*) FROM post').fetchone()[0]
     total_pages = (total_posts + per_page - 1) // per_page
+
+    # Thêm thông tin về việc theo dõi cho mỗi bài viết
+    if g.user:
+        for post in posts:
+            try:
+                # Kiểm tra xem người dùng đã theo dõi bài viết này chưa
+                follow = db.execute(
+                    'SELECT 1 FROM post_followers WHERE user_id = ? AND post_id = ?',
+                    (g.user['id'], post['id'])
+                ).fetchone()
+                post['is_following'] = follow is not None
+            except sqlite3.OperationalError:
+                # Trong trường hợp bảng post_followers chưa tồn tại
+                post['is_following'] = False
 
     return render_template('blog/index.html', posts=posts, page=page, total_pages=total_pages)
 
@@ -595,3 +610,120 @@ def delete_multiple_posts():
         return redirect(url_for('blog.my_posts'))
     else:
         return redirect(url_for('blog.blog_index'))
+
+@bp.route('/follow/<int:id>', methods=('POST',))
+@login_required
+def follow_post(id):
+    try:
+        # Lấy thông tin bài viết
+        post = get_post(id, check_author=False)
+        
+        db = get_db()
+        # Kiểm tra xem người dùng đã theo dõi bài viết này chưa
+        follow = db.execute(
+            'SELECT * FROM post_followers WHERE user_id = ? AND post_id = ?',
+            (g.user['id'], id)
+        ).fetchone()
+        
+        if follow is None:
+            # Nếu chưa theo dõi, thêm vào bảng post_followers
+            db.execute(
+                'INSERT INTO post_followers (user_id, post_id) VALUES (?, ?)',
+                (g.user['id'], id)
+            )
+            db.commit()
+            flash('Bạn đã theo dõi bài viết này thành công!')
+        else:
+            flash('Bạn đã theo dõi bài viết này từ trước!')
+    except sqlite3.OperationalError as e:
+        # Xử lý lỗi khi bảng post_followers chưa tồn tại
+        flash('Chức năng theo dõi bài viết hiện không khả dụng. Vui lòng liên hệ quản trị viên.')
+        print(f"Lỗi khi theo dõi bài viết: {str(e)}")
+    
+    # Chuyển hướng về trang hiển thị bài viết
+    return redirect(url_for('blog.blog_index'))
+
+@bp.route('/unfollow/<int:id>', methods=('POST',))
+@login_required
+def unfollow_post(id):
+    try:
+        db = get_db()
+        
+        # Xóa khỏi bảng post_followers
+        db.execute(
+            'DELETE FROM post_followers WHERE user_id = ? AND post_id = ?',
+            (g.user['id'], id)
+        )
+        db.commit()
+        
+        flash('Bạn đã bỏ theo dõi bài viết này thành công!')
+    except sqlite3.OperationalError as e:
+        # Xử lý lỗi khi bảng post_followers chưa tồn tại
+        flash('Chức năng bỏ theo dõi bài viết hiện không khả dụng. Vui lòng liên hệ quản trị viên.')
+        print(f"Lỗi khi bỏ theo dõi bài viết: {str(e)}")
+    
+    return redirect(url_for('blog.blog_index'))
+
+@bp.route('/followed_posts')
+@login_required
+def followed_posts():
+    try:
+        # Lấy tham số trang từ URL, mặc định là trang 1
+        page = request.args.get('page', 1, type=int)
+        per_page = 10  # Số bài viết trên mỗi trang
+        
+        db = get_db()
+        
+        # Đếm tổng số bài viết đang theo dõi
+        count = db.execute(
+            'SELECT COUNT(*) FROM post_followers WHERE user_id = ?',
+            (g.user['id'],)
+        ).fetchone()[0]
+        
+        # Tính toán tổng số trang
+        total_pages = (count + per_page - 1) // per_page
+        
+        # Lấy danh sách bài viết đang theo dõi
+        posts_rows = db.execute(
+            'SELECT p.id, p.title, p.text_content, p.created, p.author_id, u.username, '
+            'CASE WHEN u.is_admin = 1 THEN 1 ELSE 0 END as is_admin '
+            'FROM post p JOIN user u ON p.author_id = u.id '
+            'JOIN post_followers pf ON p.id = pf.post_id '
+            'WHERE pf.user_id = ? '
+            'ORDER BY pf.created DESC LIMIT ? OFFSET ?',
+            (g.user['id'], per_page, (page - 1) * per_page)
+        ).fetchall()
+        
+        # Chuyển đổi danh sách Row thành danh sách dict
+        posts = []
+        for post_row in posts_rows:
+            # Chuyển đổi Row thành dict
+            post = dict(post_row)
+            
+            # Lấy hình ảnh
+            images = db.execute(
+                'SELECT content FROM post_content WHERE post_id = ? AND content_type = ? ORDER BY display_order',
+                (post['id'], 'image')
+            ).fetchall()
+            post['images'] = [image['content'] for image in images] if images else []
+            
+            # Lấy liên kết
+            links = db.execute(
+                'SELECT content FROM post_content WHERE post_id = ? AND content_type = ? ORDER BY display_order',
+                (post['id'], 'link')
+            ).fetchall()
+            post['links'] = [link['content'] for link in links] if links else []
+            
+            # Kiểm tra xem người dùng có đang theo dõi bài viết này không
+            post['is_following'] = True
+            
+            posts.append(post)
+        
+        return render_template('blog/followed_posts.html', posts=posts, page=page, 
+                              total_pages=total_pages)
+    
+    except sqlite3.OperationalError as e:
+        # Nếu bảng post_followers chưa tồn tại, thông báo cho người dùng
+        flash('Chức năng theo dõi bài viết hiện không khả dụng. Vui lòng chạy lệnh "flask init-db" để cập nhật cơ sở dữ liệu.')
+        print(f"Lỗi khi truy cập bài viết đã theo dõi: {str(e)}")
+        return render_template('blog/followed_posts.html', posts=[], page=1, total_pages=0)

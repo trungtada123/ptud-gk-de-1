@@ -169,8 +169,12 @@ header .container {
 }
 
 .btn.warning {
-  background-color: var(--warning-color);
+  background-color: #ff9800;
   color: white;
+}
+
+.btn.warning:hover {
+  background-color: #e68a00;
 }
 
 .btn.outline {
@@ -460,6 +464,7 @@ textarea.form-control {
 .post-actions {
   display: flex;
   gap: 0.5rem;
+  align-items: center;
 }
 
 /* Pagination */
@@ -759,4 +764,9 @@ textarea.form-control {
 
 .p-3 {
   padding: 1.5rem;
+}
+
+.inline-form {
+  display: inline-block;
+  margin: 0;
 }
