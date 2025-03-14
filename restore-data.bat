@@ -1,18 +1,18 @@
 @echo off
 echo =================================================
-echo            KHÔI PHỤC DỮ LIỆU TỪ GIT
+echo            KHOI PHUC DU LIEU TU GIT
 echo =================================================
 
 :: Kiểm tra xem thư mục data có tồn tại không
 if not exist data (
-    echo Không tìm thấy thư mục data!
-    echo Vui lòng đảm bảo bạn đã clone toàn bộ repository.
+    echo Khong tim thay thu muc data!
+    echo Vui long dam bao ban da clone toan bo repository.
     goto :end
 )
 
 :: Kiểm tra xem có file database backup không
 if not exist data\flaskr.sqlite.backup (
-    echo Không tìm thấy file database backup!
+    echo Khong tim thay file database backup!
     goto :end
 )
 
@@ -20,21 +20,21 @@ if not exist data\flaskr.sqlite.backup (
 if not exist instance mkdir instance
 
 :: Khôi phục database
-echo Đang khôi phục database...
+echo Dang khoi phuc database...
 copy data\flaskr.sqlite.backup instance\flaskr.sqlite
 
 :: Tạo thư mục cho hình ảnh
 if not exist flaskr\static\images mkdir flaskr\static\images
 
 :: Khôi phục hình ảnh
-echo Đang khôi phục hình ảnh...
+echo Dang khoi phuc hinh anh...
 if exist data\images (
     xcopy /E /Y data\images flaskr\static\images\
 )
 
-echo Đã hoàn tất khôi phục dữ liệu!
+echo Da hoan tat khoi phuc du lieu!
 echo.
-echo Bây giờ bạn có thể chạy ứng dụng với dữ liệu đầy đủ.
+echo Bay gio ban co the chay ung dung voi du lieu day du.
 
 :end
 pause 
