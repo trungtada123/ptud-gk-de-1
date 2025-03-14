@@ -1,45 +1,70 @@
-# Flask Tiny App
+# Flask Blog App
 
-## Thông tin:
-- Họ tên: Nguyễn Chí Trung
-- Mã sinh viên: 22719231
+Ứng dụng blog đơn giản được xây dựng bằng Flask.
 
+## Cài đặt
 
-## Mô tả
-Ứng dụng web quản lý bài viết đơn giản bằng Flask bao gồm 2 tác nhân chính là Admin và User. Trong đó Admin có quyền block, unblock, reset mật khẩu cho người dùng. Các bài viết được phân trang theo số lượng bài: 10 bài / trang,....
+### Cài đặt tự động
 
-## Hướng dẫn cài đặt và chạy
-```bash
-Bước 1: Clone về máy
-git clone https://github.com/trungtada123/flask-tiny-app.git
+1. Chạy file `install.bat` để cài đặt ứng dụng
+2. Script sẽ tự động:
+   - Tạo môi trường ảo Python
+   - Cài đặt các thư viện cần thiết
+   - Kiểm tra và hỏi bạn có muốn khởi tạo database mới hay không
+   - Khởi động ứng dụng ở chế độ debug
 
-Bước 2: Di chuyển đến thư mục app
-cd flask-tiny-app
+### Cài đặt thủ công
 
+1. Tạo môi trường ảo Python:
+   ```
+   python -m venv venv
+   ```
 
-Bước 3: Có thể dùng lệnh terminal để khởi chạy tự động:
-.\install.bat
+2. Kích hoạt môi trường ảo:
+   - Windows: `venv\Scripts\activate`
+   - Linux/Mac: `source venv/bin/activate`
 
-Hoặc thực hiệ thủ công như sau:
+3. Cài đặt các thư viện:
+   ```
+   pip install -r requirements.txt
+   pip install flask
+   ```
 
-Bước 3: Tạo môi trường ảo
-python -m venv venv # Tạo môi trường ảo
-venv\Scripts\activate trên Windows
+4. Khởi tạo database (chỉ khi cần tạo mới):
+   ```
+   flask --app flaskr init-db
+   ```
 
-pip install -r requirements.txt
-Bước 4: Cài đặt Flask bằng cmd: pip install flask
+5. Chạy ứng dụng:
+   ```
+   flask --app flaskr run --debug
+   ```
 
-Bước 5: Chỉ định thư mục để khởi chạy flask app 
-export FLASK_APP=flaskr  # set FLASK_APP=flaskr trên Windows
+## Quản lý dữ liệu
 
-Bước 6: Khởi tạo database
-flask --app flaskr init-db
+### Sao lưu dữ liệu
 
-Bước 7: Run app
-flask --app flaskr run --debug
+Để sao lưu dữ liệu hiện tại:
 
+1. Đảm bảo ứng dụng không đang chạy
+2. Chạy file `backup.bat`
+3. File sao lưu sẽ được lưu trong thư mục `backups/` với tên bao gồm ngày giờ
 
+### Khôi phục dữ liệu
 
-Hoặc cũng có thể chạy tự động bằng docker
-B1: docker build -t flask-tiny-app .
-B2: docker run -p 5000:5000 flask-tiny-app
+Để khôi phục từ bản sao lưu:
+
+1. Đảm bảo ứng dụng không đang chạy
+2. Chạy file `restore.bat`
+3. Làm theo hướng dẫn để chọn bản sao lưu cần khôi phục
+
+### Triển khai trên máy mới với dữ liệu cũ
+
+1. Sao lưu file `instance/flaskr.sqlite` từ máy cũ
+2. Cài đặt ứng dụng trên máy mới bằng `install.bat` (chọn KHÔNG khởi tạo database mới)
+3. Sau khi cài đặt, sao chép file database đã sao lưu vào thư mục `instance/` của máy mới
+
+## Tài khoản mặc định
+
+- Tên đăng nhập: `admin`
+- Mật khẩu: `trungtada123`
