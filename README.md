@@ -46,7 +46,7 @@
 
 Sau khi khởi động, ứng dụng sẽ chạy tại:
 - URL: http://localhost:5000
-- Tài khoản mặc định: admin / trungtada123
+- Tài khoản / Mật khẩu Admin ( mặc định ): admin / trungtada123
 
 ## Quản lý dữ liệu
 
@@ -124,7 +124,7 @@ flask-tiny-app/
 └── README.md              # File này
 ```
 
-## Tài khoản mặc định
+## Tài khoản admin ( Mặc Định )
 
 - **Username**: admin
 - **Password**: trungtada123
