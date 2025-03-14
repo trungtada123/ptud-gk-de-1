@@ -1,3 +1,7 @@
+# Thông tin cá nhân:
+## Mã số sinh viên: 22719231
+## Họ Tên: Nguyễn Chí Trung
+
 # Ứng dụng Flask Blog
 
 Ứng dụng blog đơn giản được xây dựng bằng Python Flask với các tính năng:
@@ -11,39 +15,38 @@
 ### Cài đặt mới (sau khi clone từ GitHub)
 
 1. Clone repository từ GitHub:
-
+   ```
    git clone https://github.com/trungtada123/ptud-gk-de-1
-   
-1.1 Di chuyển đến thư mục chính
-   cd flask-tiny-app
-
-
+   ```
+2. Di chuyển đến thư mục chính
+   ```
+    cd ptud-gk-de-1
+   ```
 3. Chạy script cài đặt:
-
+   ```
     .\setup.bat
-   
+   ```
    Script này sẽ:
    - Tạo môi trường ảo Python
    - Cài đặt thư viện Flask
 
 4. Khôi phục dữ liệu (bài viết và hình ảnh):
-   
+     ``` 
    .\restore-data.bat
-   
+      ```
    Script này sẽ:
    - Khôi phục cơ sở dữ liệu từ bản sao lưu
    - Khôi phục hình ảnh từ thư mục data
 
-6. Chạy ứng dụng:
-
+5. Chạy ứng dụng:
+   ```
    .\run.bat
-
-
+   ```
 ### Sử dụng ứng dụng
 
 Sau khi khởi động, ứng dụng sẽ chạy tại:
 - URL: http://localhost:5000
-- Tài khoản mặc định: admin / trungtada123
+- Tài khoản / Mật khẩu Admin ( mặc định ): admin / trungtada123
 
 ## Quản lý dữ liệu
 
@@ -121,7 +124,7 @@ flask-tiny-app/
 └── README.md              # File này
 ```
 
-## Tài khoản mặc định
+## Tài khoản admin ( Mặc Định )
 
 - **Username**: admin
 - **Password**: trungtada123
