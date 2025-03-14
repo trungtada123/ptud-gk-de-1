@@ -50,7 +50,7 @@ flask --app flaskr run --debug
 ### Sử dụng ứng dụng
 
 Sau khi khởi động, ứng dụng sẽ chạy tại:
-- URL: http://localhost:5000
+- URL: http://127.0.0.1:5000/
 - Tài khoản / Mật khẩu Admin ( mặc định ): admin / trungtada123
 
 ## Quản lý dữ liệu
