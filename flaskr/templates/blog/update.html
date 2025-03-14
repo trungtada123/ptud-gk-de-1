@@ -1,24 +1,372 @@
 {% extends 'base.html' %}
-{% block title %}Chỉnh Sửa "{{ post['title'] }}"{% endblock %}
+{% block title %}Chỉnh Sửa "{{ post.title }}"{% endblock %}
 
 {% block header %}
-    <h1>Chỉnh Sửa "{{ post['title'] }}"</h1>
+    <h1>Chỉnh Sửa "{{ post.title }}"</h1>
 {% endblock %}
 
 {% block content %}
-<form method="post" class="form">
+<form method="post" class="form" enctype="multipart/form-data" id="updatePostForm">
     <div class="form-group">
         <label for="title">Tiêu đề</label>
-        <input name="title" id="title" value="{{ request.form.title or post['title'] }}" required>
+        <input name="title" id="title" value="{{ request.form.title or post.title }}" required>
     </div>
-    <div class="form-group">
-        <label for="body">Nội dung</label>
-        <textarea name="body" id="body" required>{{ request.form.body or post['body'] }}</textarea>
+    
+    <!-- Nội dung văn bản -->
+    <div class="form-group content-section">
+        <div class="section-header">
+            <h3>Nội dung văn bản</h3>
+            {% if post.text_content %}
+            <div class="keep-content">
+                <input type="checkbox" id="keep_text" name="keep_text" checked>
+                <label for="keep_text">Giữ nội dung văn bản hiện tại</label>
+            </div>
+            {% endif %}
+        </div>
+        
+        {% if post.text_content %}
+        <div class="current-content" id="current_text">
+            <h4>Nội dung hiện tại:</h4>
+            <div class="current-text">{{ post.text_content }}</div>
+        </div>
+        {% endif %}
+        
+        <div id="new_text_section" {% if post.text_content %}style="display: none;"{% endif %}>
+            <textarea name="text_content" id="text_content" rows="5" placeholder="Nhập nội dung văn bản mới ở đây...">{{ request.form.text_content or '' }}</textarea>
+        </div>
     </div>
-    <input type="submit" value="Lưu" class="btn">
+    
+    <!-- Hình ảnh -->
+    <div class="form-group content-section">
+        <div class="section-header">
+            <h3>Hình ảnh</h3>
+            {% if post.images %}
+            <div class="keep-content">
+                <input type="checkbox" id="keep_images" name="keep_images" checked>
+                <label for="keep_images">Giữ hình ảnh hiện tại</label>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Hiển thị hình ảnh hiện tại -->
+        {% if post.images %}
+        <div class="current-content" id="current_images">
+            <h4>Hình ảnh hiện tại:</h4>
+            <div class="image-gallery">
+                {% for image in post.images %}
+                <div class="current-image-container">
+                    <img src="{{ image }}" alt="Hình ảnh" style="max-width: 150px; max-height: 150px;">
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Form tải lên hình ảnh mới -->
+        <div id="new_images_section">
+            <h4>Thêm hình ảnh mới:</h4>
+            <div id="image-inputs">
+                <div class="image-input-group">
+                    <input type="file" name="images[]" class="image-input" accept="image/*" onchange="previewImage(this)">
+                    <div class="image-preview"></div>
+                    <button type="button" class="btn remove-btn" onclick="removeImageInput(this)" style="display:none;">Xóa</button>
+                </div>
+            </div>
+            <button type="button" class="btn add-btn" onclick="addImageInput()">+ Thêm hình ảnh</button>
+        </div>
+    </div>
+    
+    <!-- Liên kết -->
+    <div class="form-group content-section">
+        <div class="section-header">
+            <h3>Liên kết</h3>
+            {% if post.links %}
+            <div class="keep-content">
+                <input type="checkbox" id="keep_links" name="keep_links" checked>
+                <label for="keep_links">Giữ liên kết hiện tại</label>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Hiển thị liên kết hiện tại -->
+        {% if post.links %}
+        <div class="current-content" id="current_links">
+            <h4>Liên kết hiện tại:</h4>
+            <ul>
+                {% for link in post.links %}
+                <li><a href="{{ link }}" target="_blank">{{ link }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        
+        <!-- Form thêm liên kết mới -->
+        <div id="new_links_section">
+            <h4>Thêm liên kết mới:</h4>
+            <div id="link-inputs">
+                <div class="link-input-group">
+                    <input type="url" name="links[]" class="link-input" placeholder="https://example.com">
+                    <button type="button" class="btn remove-btn" onclick="removeLinkInput(this)" style="display:none;">Xóa</button>
+                </div>
+            </div>
+            <button type="button" class="btn add-btn" onclick="addLinkInput()">+ Thêm liên kết</button>
+        </div>
+    </div>
+    
+    <input type="submit" value="Lưu thay đổi" class="btn primary-btn">
 </form>
 <hr>
-<form action="{{ url_for('blog.delete_post', id=post['id']) }}" method="post" class="form">
-    <input class="btn danger" type="submit" value="Xóa" onclick="return confirm('Bạn có chắc chắn không?');">
+<form action="{{ url_for('blog.delete_post', id=post.id) }}" method="post" class="form">
+    <input class="btn danger" type="submit" value="Xóa bài viết" onclick="return confirm('Bạn có chắc chắn muốn xóa bài viết này không?');">
 </form>
+
+<script>
+// Xử lý nội dung văn bản
+document.addEventListener('DOMContentLoaded', function() {
+    const keepTextCheckbox = document.getElementById('keep_text');
+    if (keepTextCheckbox) {
+        keepTextCheckbox.addEventListener('change', function() {
+            const currentText = document.getElementById('current_text');
+            const newTextSection = document.getElementById('new_text_section');
+            
+            if (this.checked) {
+                currentText.style.display = 'block';
+                newTextSection.style.display = 'none';
+            } else {
+                currentText.style.display = 'none';
+                newTextSection.style.display = 'block';
+            }
+        });
+    }
+    
+    const keepImagesCheckbox = document.getElementById('keep_images');
+    if (keepImagesCheckbox) {
+        keepImagesCheckbox.addEventListener('change', function() {
+            const currentImages = document.getElementById('current_images');
+            
+            if (this.checked) {
+                currentImages.style.display = 'block';
+            } else {
+                currentImages.style.display = 'none';
+            }
+        });
+    }
+    
+    const keepLinksCheckbox = document.getElementById('keep_links');
+    if (keepLinksCheckbox) {
+        keepLinksCheckbox.addEventListener('change', function() {
+            const currentLinks = document.getElementById('current_links');
+            
+            if (this.checked) {
+                currentLinks.style.display = 'block';
+            } else {
+                currentLinks.style.display = 'none';
+            }
+        });
+    }
+});
+
+// Xử lý hình ảnh
+function addImageInput() {
+    const container = document.getElementById('image-inputs');
+    const newGroup = document.createElement('div');
+    newGroup.className = 'image-input-group';
+    newGroup.innerHTML = `
+        <input type="file" name="images[]" class="image-input" accept="image/*" onchange="previewImage(this)">
+        <div class="image-preview"></div>
+        <button type="button" class="btn remove-btn" onclick="removeImageInput(this)">Xóa</button>
+    `;
+    container.appendChild(newGroup);
+}
+
+function removeImageInput(button) {
+    const group = button.parentElement;
+    group.remove();
+}
+
+function previewImage(input) {
+    const preview = input.nextElementSibling;
+    const removeBtn = input.parentElement.querySelector('.remove-btn');
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.innerHTML = `<img src="${e.target.result}" style="max-width: 200px; max-height: 150px;">`;
+            removeBtn.style.display = 'inline-block';
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// Xử lý liên kết
+function addLinkInput() {
+    const container = document.getElementById('link-inputs');
+    const newGroup = document.createElement('div');
+    newGroup.className = 'link-input-group';
+    newGroup.innerHTML = `
+        <input type="url" name="links[]" class="link-input" placeholder="https://example.com">
+        <button type="button" class="btn remove-btn" onclick="removeLinkInput(this)">Xóa</button>
+    `;
+    container.appendChild(newGroup);
+}
+
+function removeLinkInput(button) {
+    const group = button.parentElement;
+    group.remove();
+}
+
+// Kiểm tra form trước khi submit
+document.getElementById('updatePostForm').addEventListener('submit', function(e) {
+    const title = document.getElementById('title').value;
+    const keepText = document.getElementById('keep_text');
+    const keepImages = document.getElementById('keep_images');
+    const keepLinks = document.getElementById('keep_links');
+    
+    let hasContent = false;
+    
+    // Kiểm tra tiêu đề
+    if (!title) {
+        alert('Vui lòng nhập tiêu đề cho bài viết');
+        e.preventDefault();
+        return;
+    }
+    
+    // Kiểm tra nội dung văn bản
+    if (keepText && keepText.checked) {
+        hasContent = true;
+    } else {
+        const textContent = document.getElementById('text_content').value;
+        if (textContent.trim()) hasContent = true;
+    }
+    
+    // Kiểm tra hình ảnh
+    if (keepImages && keepImages.checked) {
+        hasContent = true;
+    } else {
+        const images = document.querySelectorAll('.image-input');
+        for (let img of images) {
+            if (img.files && img.files[0]) {
+                hasContent = true;
+                break;
+            }
+        }
+    }
+    
+    // Kiểm tra liên kết
+    if (keepLinks && keepLinks.checked) {
+        hasContent = true;
+    } else {
+        const links = document.querySelectorAll('.link-input');
+        for (let link of links) {
+            if (link.value.trim()) {
+                hasContent = true;
+                break;
+            }
+        }
+    }
+    
+    if (!hasContent) {
+        alert('Bài viết phải có ít nhất một loại nội dung: văn bản, hình ảnh hoặc liên kết');
+        e.preventDefault();
+    }
+});
+
+// Tự động hiển thị nút xóa cho input đầu tiên nếu có giá trị
+document.addEventListener('DOMContentLoaded', function() {
+    const firstImage = document.querySelector('.image-input');
+    if (firstImage) {
+        firstImage.addEventListener('change', function() {
+            const removeBtn = this.parentElement.querySelector('.remove-btn');
+            if (this.files && this.files[0]) {
+                removeBtn.style.display = 'inline-block';
+            }
+        });
+    }
+    
+    const firstLink = document.querySelector('.link-input');
+    if (firstLink) {
+        firstLink.addEventListener('input', function() {
+            const removeBtn = this.parentElement.querySelector('.remove-btn');
+            if (this.value.trim()) {
+                removeBtn.style.display = 'inline-block';
+            } else {
+                removeBtn.style.display = 'none';
+            }
+        });
+    }
+});
+</script>
+
+<style>
+.content-section {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.keep-content {
+    font-size: 0.9em;
+    color: #666;
+}
+.image-input-group, .link-input-group {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+.image-preview {
+    margin: 0 10px;
+}
+.remove-btn {
+    background-color: #f44336;
+    color: white;
+    margin-left: 10px;
+}
+.add-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+.primary-btn {
+    background-color: #2196F3;
+    color: white;
+    font-weight: bold;
+}
+.current-content {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+}
+.current-text {
+    white-space: pre-wrap;
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+}
+.image-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 10px 0;
+}
+.current-image-container {
+    border: 1px solid #ddd;
+    padding: 5px;
+    border-radius: 4px;
+    background-color: white;
+}
+h4 {
+    margin-top: 15px;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+    color: #333;
+}
+</style>
 {% endblock %}

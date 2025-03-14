@@ -6,15 +6,174 @@
 {% endblock %}
 
 {% block content %}
-<form method="post" class="form">
+<form method="post" class="form" enctype="multipart/form-data" id="createPostForm">
     <div class="form-group">
         <label for="title">Tiêu đề</label>
         <input name="title" id="title" value="{{ request.form.title or '' }}" required>
     </div>
-    <div class="form-group">
-        <label for="body">Nội dung</label>
-        <textarea name="body" id="body" required>{{ request.form.body or '' }}</textarea>
+    
+    <!-- Nội dung văn bản -->
+    <div class="form-group content-section">
+        <h3>Nội dung văn bản</h3>
+        <textarea name="text_content" id="text_content" rows="5" placeholder="Nhập nội dung văn bản của bạn ở đây...">{{ request.form.text_content or '' }}</textarea>
     </div>
-    <input type="submit" value="Lưu" class="btn">
+    
+    <!-- Hình ảnh -->
+    <div class="form-group content-section">
+        <h3>Hình ảnh</h3>
+        <div id="image-inputs">
+            <div class="image-input-group">
+                <input type="file" name="images[]" class="image-input" accept="image/*" onchange="previewImage(this)">
+                <div class="image-preview"></div>
+                <button type="button" class="btn remove-btn" onclick="removeImageInput(this)" style="display:none;">Xóa</button>
+            </div>
+        </div>
+        <button type="button" class="btn add-btn" onclick="addImageInput()">+ Thêm hình ảnh</button>
+    </div>
+    
+    <!-- Liên kết -->
+    <div class="form-group content-section">
+        <h3>Liên kết</h3>
+        <div id="link-inputs">
+            <div class="link-input-group">
+                <input type="url" name="links[]" class="link-input" placeholder="https://example.com">
+                <button type="button" class="btn remove-btn" onclick="removeLinkInput(this)" style="display:none;">Xóa</button>
+            </div>
+        </div>
+        <button type="button" class="btn add-btn" onclick="addLinkInput()">+ Thêm liên kết</button>
+    </div>
+    
+    <input type="submit" value="Đăng bài" class="btn">
 </form>
+
+<script>
+// Xử lý hình ảnh
+function addImageInput() {
+    const container = document.getElementById('image-inputs');
+    const newGroup = document.createElement('div');
+    newGroup.className = 'image-input-group';
+    newGroup.innerHTML = `
+        <input type="file" name="images[]" class="image-input" accept="image/*" onchange="previewImage(this)">
+        <div class="image-preview"></div>
+        <button type="button" class="btn remove-btn" onclick="removeImageInput(this)">Xóa</button>
+    `;
+    container.appendChild(newGroup);
+}
+
+function removeImageInput(button) {
+    const group = button.parentElement;
+    group.remove();
+}
+
+function previewImage(input) {
+    const preview = input.nextElementSibling;
+    const removeBtn = input.parentElement.querySelector('.remove-btn');
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.innerHTML = `<img src="${e.target.result}" style="max-width: 200px; max-height: 150px;">`;
+            removeBtn.style.display = 'inline-block';
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// Xử lý liên kết
+function addLinkInput() {
+    const container = document.getElementById('link-inputs');
+    const newGroup = document.createElement('div');
+    newGroup.className = 'link-input-group';
+    newGroup.innerHTML = `
+        <input type="url" name="links[]" class="link-input" placeholder="https://example.com">
+        <button type="button" class="btn remove-btn" onclick="removeLinkInput(this)">Xóa</button>
+    `;
+    container.appendChild(newGroup);
+}
+
+function removeLinkInput(button) {
+    const group = button.parentElement;
+    group.remove();
+}
+
+// Kiểm tra form trước khi submit
+document.getElementById('createPostForm').addEventListener('submit', function(e) {
+    const title = document.getElementById('title').value;
+    const textContent = document.getElementById('text_content').value;
+    const images = document.querySelectorAll('.image-input');
+    const links = document.querySelectorAll('.link-input');
+    
+    let hasContent = false;
+    
+    // Kiểm tra tiêu đề
+    if (!title) {
+        alert('Vui lòng nhập tiêu đề cho bài viết');
+        e.preventDefault();
+        return;
+    }
+    
+    // Kiểm tra xem có ít nhất một loại nội dung nào đó
+    if (textContent.trim()) hasContent = true;
+    
+    images.forEach(img => {
+        if (img.files && img.files[0]) hasContent = true;
+    });
+    
+    links.forEach(link => {
+        if (link.value.trim()) hasContent = true;
+    });
+    
+    if (!hasContent) {
+        alert('Vui lòng thêm ít nhất một loại nội dung: văn bản, hình ảnh hoặc liên kết');
+        e.preventDefault();
+    }
+});
+
+// Tự động hiển thị nút xóa cho input đầu tiên nếu có giá trị
+document.addEventListener('DOMContentLoaded', function() {
+    const firstImage = document.querySelector('.image-input');
+    firstImage.addEventListener('change', function() {
+        const removeBtn = this.parentElement.querySelector('.remove-btn');
+        if (this.files && this.files[0]) {
+            removeBtn.style.display = 'inline-block';
+        }
+    });
+    
+    const firstLink = document.querySelector('.link-input');
+    firstLink.addEventListener('input', function() {
+        const removeBtn = this.parentElement.querySelector('.remove-btn');
+        if (this.value.trim()) {
+            removeBtn.style.display = 'inline-block';
+        } else {
+            removeBtn.style.display = 'none';
+        }
+    });
+});
+</script>
+
+<style>
+.content-section {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+.image-input-group, .link-input-group {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+.image-preview {
+    margin: 0 10px;
+}
+.remove-btn {
+    background-color: #f44336;
+    color: white;
+    margin-left: 10px;
+}
+.add-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+</style>
 {% endblock %}

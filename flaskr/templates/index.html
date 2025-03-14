@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Trang Chủ{% endblock %}
+
+{% block content %}
+<div class="redirect-container">
+  <h1>Chào mừng đến với Blog App</h1>
+  <p>Đang chuyển hướng đến trang blog...</p>
+  <a class="btn" href="{{ url_for('blog.blog_index') }}">Đi đến Blog ngay</a>
+</div>
+
+<script>
+  // Tự động chuyển hướng sau 2 giây
+  setTimeout(function() {
+    window.location.href = "{{ url_for('blog.blog_index') }}";
+  }, 2000);
+</script>
+{% endblock %}

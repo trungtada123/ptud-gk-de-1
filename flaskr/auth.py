@@ -50,19 +50,17 @@ def login():
 
         if user is None:
             error = 'Incorrect username.'
+        elif user['is_blocked']:
+            error = 'Your account has been blocked.'
         elif not check_password_hash(user['password'], password):
             error = 'Incorrect password.'
-
-        if user and user['is_blocked']:
-            flash('Your account has been blocked.', 'danger')
-            return redirect(url_for('auth.login'))
 
         if error is None:
             session.clear()
             session['user_id'] = user['id']
-            if user['is_admin']:  # Kiểm tra xem người dùng có phải là admin không
-                return redirect(url_for('blog.admin'))  # Chuyển đến trang admin
-            return redirect(url_for('index'))  # Chuyển đến trang chính cho người dùng bình thường
+            if user['is_admin']:
+                return redirect(url_for('blog.admin'))
+            return redirect(url_for('index'))
 
         flash(error)
 

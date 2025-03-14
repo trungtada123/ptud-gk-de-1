@@ -10,7 +10,37 @@
                     <h3>{{ post.title }}</h3>
                     <div class="about">Bởi {{ post.username }} vào {{ post.created.strftime('%Y-%m-%d') }}</div>
                 </header>
-                <p class="body">{{ post.body }}</p>
+                
+                <!-- Hiển thị nội dung văn bản -->
+                {% if post.text_content %}
+                <div class="post-text">
+                    {{ post.text_content }}
+                </div>
+                {% endif %}
+                
+                <!-- Hiển thị hình ảnh -->
+                {% if post.images %}
+                <div class="post-images">
+                    {% for image in post.images %}
+                    <div class="image-container">
+                        <img src="{{ image }}" alt="Hình ảnh" class="post-image">
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <!-- Hiển thị liên kết -->
+                {% if post.links %}
+                <div class="post-links">
+                    <h4>Liên kết:</h4>
+                    <ul>
+                        {% for link in post.links %}
+                        <li><a href="{{ link }}" target="_blank">{{ link }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                
                 <footer>
                     <input type="checkbox" name="post_ids" value="{{ post.id }}">
                     <a class="btn" href="{{ url_for('blog.update', id=post.id) }}">Chỉnh Sửa</a>
@@ -35,7 +65,38 @@
     </div>
 
     <div class="navigation-links">
-        <a class="btn" href="{{ url_for('blog.index') }}">Quay lại Blog</a>
+        <a class="btn" href="{{ url_for('blog.blog_index') }}">Quay lại Blog</a>
     </div>
 </section>
+
+<style>
+  .post-images {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 15px 0;
+  }
+  .image-container {
+    max-width: 200px;
+    max-height: 200px;
+    overflow: hidden;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  .post-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .post-links {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+  }
+  .post-text {
+    margin: 15px 0;
+    line-height: 1.6;
+  }
+</style>
 {% endblock %}

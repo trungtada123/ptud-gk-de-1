@@ -12,16 +12,111 @@
     {% for post in posts %}
       <div class="post-item {% if post.is_admin %}admin{% endif %}">
         <h3>{{ post.title }}</h3>
-        <p>{{ post.body }}</p>
-        <input type="checkbox" name="post_ids" value="{{ post.id }}">
+        
+        <!-- Hiển thị nội dung văn bản -->
+        {% if post.text_content %}
+        <div class="post-text">
+          {{ post.text_content }}
+        </div>
+        {% endif %}
+        
+        <!-- Hiển thị hình ảnh -->
+        {% if post.images %}
+        <div class="post-images">
+          {% for image in post.images %}
+          <div class="image-container">
+            <img src="{{ image }}" alt="Hình ảnh" class="post-image">
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- Hiển thị liên kết -->
+        {% if post.links %}
+        <div class="post-links">
+          <h4>Liên kết:</h4>
+          <ul>
+            {% for link in post.links %}
+            <li><a href="{{ link }}" target="_blank">{{ link }}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+        
+        <div class="post-meta">
+          <span>Bởi: {{ post.username }} | Ngày tạo: {{ post.created.strftime('%Y-%m-%d') }}</span>
+        </div>
+        <div class="post-actions">
+          <input type="checkbox" name="post_ids" value="{{ post.id }}">
+          <a class="btn edit" href="{{ url_for('blog.update', id=post.id) }}">Chỉnh sửa</a>
+        </div>
       </div>
       <hr>
     {% endfor %}
     <input class="btn danger" type="submit" value="Delete Selected" onclick="return confirm('Are you sure you want to delete the selected posts?');">
   </form>
+  
+  <div class="pagination">
+    {% if page > 1 %}
+      <a class="btn" href="{{ url_for('blog.admin_posts', page=page-1) }}">Trang Trước</a>
+    {% endif %}
+    {% for p in range(1, total_pages + 1) %}
+      <a class="btn {% if p == page %}active{% endif %}" href="{{ url_for('blog.admin_posts', page=p) }}">{{ p }}</a>
+    {% endfor %}
+    {% if page < total_pages %}
+      <a class="btn" href="{{ url_for('blog.admin_posts', page=page+1) }}">Trang Sau</a>
+    {% endif %}
+  </div>
+  
   <div class="navigation-links">
     <a class="btn" href="{{ url_for('blog.admin') }}">Back to Admin Panel</a>
-    <a class="btn" href="{{ url_for('blog.index') }}">To Blog</a>
+    <a class="btn" href="{{ url_for('blog.blog_index') }}">To Blog</a>
   </div>
 </section>
+
+<style>
+  .post-images {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 15px 0;
+  }
+  .image-container {
+    max-width: 200px;
+    max-height: 200px;
+    overflow: hidden;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  .post-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .post-links {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+  }
+  .post-text {
+    margin: 15px 0;
+    line-height: 1.6;
+  }
+  .post-actions {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .edit {
+    background-color: #2196F3;
+    color: white;
+  }
+  .post-meta {
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 10px;
+  }
+</style>
 {% endblock %}

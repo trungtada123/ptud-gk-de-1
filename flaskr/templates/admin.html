@@ -11,7 +11,7 @@
     <div class="admin-actions">
         <a class="btn" href="{{ url_for('blog.admin_posts') }}">Quản lý bài viết blog</a>
         <a class="btn" href="{{ url_for('blog.admin_my_posts') }}">Quản lý bài viết của tôi</a>
-        <a class="btn" href="{{ url_for('blog.index') }}">Đến blog</a>
+        <a class="btn" href="{{ url_for('blog.blog_index') }}">Đến blog</a>
     </div>
     <div class="user-list">
         {% for user in users %}

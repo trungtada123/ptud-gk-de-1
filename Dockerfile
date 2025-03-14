@@ -10,5 +10,5 @@ COPY . /app
 # Cài đặt các package cần thiết
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Chạy Flask (giả sử file chính là `flaskr`)
+# Chạy Flask
 CMD ["flask", "--app", "flaskr", "run", "--host=0.0.0.0"]
