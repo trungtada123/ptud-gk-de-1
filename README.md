@@ -13,10 +13,12 @@
 1. Clone repository từ GitHub:
 
    git clone https://github.com/trungtada123/ptud-gk-de-1
+   
+1.1 Di chuyển đến thư mục chính
    cd flask-tiny-app
 
 
-2. Chạy script cài đặt:
+3. Chạy script cài đặt:
 
     .\setup.bat
    
