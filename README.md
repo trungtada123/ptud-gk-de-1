@@ -42,6 +42,11 @@
    ```
    .\run-new.bat
    ```
+
+Lưu ý: Nếu chạy lệnh đó mà không thấy link thì khởi động thủ công bằng lệnh:
+```
+flask --app flaskr run --debug
+```
 ### Sử dụng ứng dụng
 
 Sau khi khởi động, ứng dụng sẽ chạy tại:
