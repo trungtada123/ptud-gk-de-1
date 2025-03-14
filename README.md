@@ -15,34 +15,33 @@
 ### Cài đặt mới (sau khi clone từ GitHub)
 
 1. Clone repository từ GitHub:
-
+   ```
    git clone https://github.com/trungtada123/ptud-gk-de-1
-   
+   ```
 2. Di chuyển đến thư mục chính
-
+   ```
     cd flask-tiny-app
-
+   ```
 3. Chạy script cài đặt:
-
+   ```
     .\setup.bat
-   
+   ```
    Script này sẽ:
    - Tạo môi trường ảo Python
    - Cài đặt thư viện Flask
 
 4. Khôi phục dữ liệu (bài viết và hình ảnh):
-   
+     ``` 
    .\restore-data.bat
-   
+      ```
    Script này sẽ:
    - Khôi phục cơ sở dữ liệu từ bản sao lưu
    - Khôi phục hình ảnh từ thư mục data
 
 5. Chạy ứng dụng:
-
+   ```
    .\run.bat
-
-
+   ```
 ### Sử dụng ứng dụng
 
 Sau khi khởi động, ứng dụng sẽ chạy tại:
