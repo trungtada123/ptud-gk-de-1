@@ -1,3 +1,7 @@
+# Thông tin cá nhân:
+## Mã số sinh viên: 22719231
+## Họ Tên: Nguyễn Chí Trung
+
 # Ứng dụng Flask Blog
 
 Ứng dụng blog đơn giản được xây dựng bằng Python Flask với các tính năng:
