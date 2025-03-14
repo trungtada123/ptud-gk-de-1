@@ -1,0 +1,34 @@
+# Bỏ qua môi trường ảo
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Bỏ qua các file cụ thể
+*.log
+.env
+.DS_Store
+Thumbs.db
+
+# Không bỏ qua những thư mục/file dữ liệu quan trọng
+!instance/
+!instance/flaskr.sqlite
+!flaskr/static/images/
+!data/ 

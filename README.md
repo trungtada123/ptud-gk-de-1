@@ -10,7 +10,8 @@
 2. Script sẽ tự động:
    - Tạo môi trường ảo Python
    - Cài đặt các thư viện cần thiết
-   - Kiểm tra và hỏi bạn có muốn khởi tạo database mới hay không
+   - Phát hiện và khôi phục dữ liệu từ Git nếu có
+   - Hoặc hỏi bạn có muốn khởi tạo database mới hay không
    - Khởi động ứng dụng ở chế độ debug
 
 ### Cài đặt thủ công
@@ -30,12 +31,17 @@
    pip install flask
    ```
 
-4. Khởi tạo database (chỉ khi cần tạo mới):
+4. Khôi phục dữ liệu từ Git (nếu có):
+   ```
+   restore-data.bat
+   ```
+   
+5. Hoặc khởi tạo database mới (nếu cần):
    ```
    flask --app flaskr init-db
    ```
 
-5. Chạy ứng dụng:
+6. Chạy ứng dụng:
    ```
    flask --app flaskr run --debug
    ```
@@ -58,11 +64,20 @@
 2. Chạy file `restore.bat`
 3. Làm theo hướng dẫn để chọn bản sao lưu cần khôi phục
 
-### Triển khai trên máy mới với dữ liệu cũ
+### Đóng gói dữ liệu cho Git
 
-1. Sao lưu file `instance/flaskr.sqlite` từ máy cũ
-2. Cài đặt ứng dụng trên máy mới bằng `install.bat` (chọn KHÔNG khởi tạo database mới)
-3. Sau khi cài đặt, sao chép file database đã sao lưu vào thư mục `instance/` của máy mới
+Khi bạn muốn đưa dữ liệu và hình ảnh lên GitHub:
+
+1. Chạy script `pack-data.bat`
+2. Script sẽ sao chép database và hình ảnh vào thư mục `data/`
+3. Commit thư mục `data/` lên GitHub
+
+### Khôi phục dữ liệu từ Git
+
+Khi người khác clone repository về:
+
+1. Chạy `install.bat` - script sẽ tự động phát hiện và khôi phục dữ liệu
+2. Hoặc chạy `restore-data.bat` để khôi phục dữ liệu một cách thủ công
 
 ## Tài khoản mặc định
 
