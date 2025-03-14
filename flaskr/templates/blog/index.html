@@ -1,104 +1,118 @@
 {% extends 'base.html' %}
+
+{% block title %}Trang Chủ{% endblock %}
+
+{% block header %}
+  <h1>
+    <i class="fas fa-blog"></i> Bài Viết Mới Nhất
+  </h1>
+  <p class="text-light mb-3">Khám phá các bài viết chia sẻ kiến thức và kinh nghiệm</p>
+{% endblock %}
+
 {% block content %}
-<div class="navigation-links">
-  <a class="btn" href="{{ url_for('blog.create') }}">Tạo Bài Mới</a>
-  {% if g.user and g.user['is_admin'] %}
-    <a class="btn" href="{{ url_for('blog.admin') }}">Quay lại Bảng Điều Khiển Admin</a>
+<div class="d-flex justify-between mb-3">
+  <div class="navigation-links">
+    <a class="btn primary" href="{{ url_for('blog.create') }}">
+      <i class="fas fa-plus-circle"></i> Tạo Bài Mới
+    </a>
+    {% if g.user and g.user['is_admin'] %}
+      <a class="btn secondary" href="{{ url_for('blog.admin') }}">
+        <i class="fas fa-user-shield"></i> Bảng Điều Khiển Admin
+      </a>
+    {% endif %}
+    <a class="btn outline" href="{{ url_for('blog.my_posts') }}">
+      <i class="fas fa-list-alt"></i> Quản Lý Bài Đăng
+    </a>
+  </div>
+  
+  {% if total_pages > 1 %}
+  <div class="pagination-info">
+    <span>Trang {{ page }} / {{ total_pages }}</span>
+  </div>
   {% endif %}
-  <a class="btn" href="{{ url_for('blog.my_posts') }}">Quản lý Bài Đăng</a>
 </div>
 
-<div class="post-list">
+<div class="post-list fade-in">
   {% for post in posts %}
     <article class="post {% if post.is_admin %}admin{% endif %}">
-      <header>
-        <h2>{{ post['title'] }}</h2>
-        <div class="about">Bởi {{ post['username'] }} vào {{ post['created'].strftime('%Y-%m-%d') }}</div>
-      </header>
-      
-      <!-- Hiển thị nội dung văn bản -->
-      {% if post['text_content'] %}
-        <div class="post-text">
-          {{ post['text_content'] }}
+      <div class="post-header">
+        <h3 class="post-title">{{ post.title }}</h3>
+        <div class="post-meta">
+          <i class="fas fa-user"></i> {{ post.username }}
+          <i class="fas fa-calendar-alt ml-2"></i> {{ post.created.strftime('%d/%m/%Y') }}
         </div>
-      {% endif %}
+      </div>
       
-      <!-- Hiển thị hình ảnh -->
-      {% if post['images'] %}
+      <div class="post-content">
+        <!-- Hiển thị nội dung văn bản -->
+        {% if post.text_content %}
+        <div class="post-text">
+          {{ post.text_content }}
+        </div>
+        {% endif %}
+        
+        <!-- Hiển thị hình ảnh -->
+        {% if post.images %}
         <div class="post-images">
-          {% for image in post['images'] %}
-            <div class="image-container">
-              <img src="{{ image }}" alt="Hình ảnh" class="post-image">
-            </div>
+          {% for image in post.images %}
+          <div class="image-container">
+            <img src="{{ image }}" alt="{{ post.title }}" class="post-image">
+          </div>
           {% endfor %}
         </div>
-      {% endif %}
-      
-      <!-- Hiển thị liên kết -->
-      {% if post['links'] %}
+        {% endif %}
+        
+        <!-- Hiển thị liên kết -->
+        {% if post.links %}
         <div class="post-links">
-          <h4>Liên kết:</h4>
+          <h4><i class="fas fa-link"></i> Liên kết:</h4>
           <ul>
-            {% for link in post['links'] %}
-              <li><a href="{{ link }}" target="_blank">{{ link }}</a></li>
+            {% for link in post.links %}
+            <li><a href="{{ link }}" target="_blank">{{ link }}</a></li>
             {% endfor %}
           </ul>
         </div>
-      {% endif %}
+        {% endif %}
+      </div>
       
-      <footer>
+      <div class="post-footer">
         <div class="post-actions">
-          {% if g.user and g.user['id'] == post['author_id'] %}
-            <a class="btn edit" href="{{ url_for('blog.update', id=post['id']) }}">
-              <i class="fas fa-edit"></i> Sửa Bài
+          {% if g.user and g.user.id == post.author_id %}
+            <a class="btn sm secondary" href="{{ url_for('blog.update', id=post.id) }}">
+              <i class="fas fa-edit"></i> Sửa
             </a>
           {% endif %}
         </div>
-      </footer>
+      </div>
     </article>
+  {% else %}
+    <div class="card text-center p-3">
+      <h3 class="mb-2">Chưa có bài viết nào</h3>
+      <p>Hãy là người đầu tiên tạo bài viết!</p>
+      <a href="{{ url_for('blog.create') }}" class="btn primary mt-2">
+        <i class="fas fa-plus-circle"></i> Tạo Bài Mới
+      </a>
+    </div>
   {% endfor %}
 </div>
 
+{% if total_pages > 1 %}
 <div class="pagination">
   {% if page > 1 %}
-    <a class="btn" href="{{ url_for('blog.blog_index', page=page-1) }}">Trang Trước</a>
+    <a class="btn" href="{{ url_for('blog.blog_index', page=page-1) }}">
+      <i class="fas fa-chevron-left"></i>
+    </a>
   {% endif %}
+  
   {% for p in range(1, total_pages + 1) %}
     <a class="btn {% if p == page %}active{% endif %}" href="{{ url_for('blog.blog_index', page=p) }}">{{ p }}</a>
   {% endfor %}
+  
   {% if page < total_pages %}
-    <a class="btn" href="{{ url_for('blog.blog_index', page=page+1) }}">Trang Sau</a>
+    <a class="btn" href="{{ url_for('blog.blog_index', page=page+1) }}">
+      <i class="fas fa-chevron-right"></i>
+    </a>
   {% endif %}
 </div>
-
-<style>
-  .post-images {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin: 15px 0;
-  }
-  .image-container {
-    max-width: 200px;
-    max-height: 200px;
-    overflow: hidden;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-  }
-  .post-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  .post-links {
-    margin: 15px 0;
-    padding: 10px;
-    background-color: #f8f9fa;
-    border-radius: 4px;
-  }
-  .post-text {
-    margin: 15px 0;
-    line-height: 1.6;
-  }
-</style>
+{% endif %}
 {% endblock %} 

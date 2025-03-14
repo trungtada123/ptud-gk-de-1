@@ -2,36 +2,105 @@
 <html lang="vi">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}{% endblock %} - T BLOG</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} - BlogApp</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
-<nav>
-    <div class="nav-left">
-        <h1><a href="{{ url_for('blog.blog_index') }}">T BLOG</a></h1>
-    </div>
-    <div class="nav-right">
-        <ul>
-            {% if g.user %}
-                <li><span class="username">{{ g.user['username'] }}</span></li>
-                <li><a href="{{ url_for('auth.logout') }}">Đăng Xuất</a></li>
-            {% else %}
-                <li><a href="{{ url_for('auth.register') }}">Đăng Ký</a></li>
-                <li><a href="{{ url_for('auth.login') }}">Đăng Nhập</a></li>
-            {% endif %}
-        </ul>
-    </div>
-</nav>
-<section class="content">
     <header>
-        {% block header %}{% endblock %}
+        <div class="container">
+            <a href="{{ url_for('blog.blog_index') }}" class="brand">BlogApp</a>
+            <div class="menu-toggle" id="mobile-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <nav class="nav-links" id="nav-links">
+                {% if g.user %}
+                    <a href="{{ url_for('blog.create') }}" class="{% if request.endpoint == 'blog.create' %}active{% endif %}">
+                        <i class="fas fa-edit"></i> Tạo Bài Mới
+                    </a>
+                    <a href="{{ url_for('blog.my_posts') }}" class="{% if request.endpoint == 'blog.my_posts' %}active{% endif %}">
+                        <i class="fas fa-list-alt"></i> Bài Viết Của Tôi
+                    </a>
+                    {% if g.user['is_admin'] %}
+                        <a href="{{ url_for('blog.admin') }}" class="{% if 'admin' in request.endpoint %}active{% endif %}">
+                            <i class="fas fa-user-shield"></i> Quản Trị
+                        </a>
+                    {% endif %}
+                    <a href="{{ url_for('auth.logout') }}" class="btn outline">
+                        <i class="fas fa-sign-out-alt"></i> Đăng Xuất
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('auth.register') }}" class="{% if request.endpoint == 'auth.register' %}active{% endif %}">
+                        <i class="fas fa-user-plus"></i> Đăng Ký
+                    </a>
+                    <a href="{{ url_for('auth.login') }}" class="btn primary">
+                        <i class="fas fa-sign-in-alt"></i> Đăng Nhập
+                    </a>
+                {% endif %}
+            </nav>
+        </div>
     </header>
-    {% for message in get_flashed_messages() %}
-        <div class="flash">{{ message }}</div>
-    {% endfor %}
-    {% block content %}{% endblock %}
-</section>
+
+    <main class="container">
+        <section class="page-header mb-3">
+            {% block header %}{% endblock %}
+        </section>
+
+        {% for message in get_flashed_messages() %}
+            <div class="alert alert-info fade-in">
+                <i class="fas fa-info-circle"></i> {{ message }}
+            </div>
+        {% endfor %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="container text-center mt-3">
+        <p class="text-light">&copy; {{ get_year() }} BlogApp. Bản quyền thuộc về Nguyễn Chí Trung.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const mobileMenu = document.getElementById('mobile-menu');
+            const navLinks = document.getElementById('nav-links');
+            
+            if (mobileMenu) {
+                mobileMenu.addEventListener('click', function() {
+                    navLinks.classList.toggle('show');
+                });
+            }
+
+            // Flash message auto-hide
+            const alerts = document.querySelectorAll('.alert');
+            if (alerts.length) {
+                setTimeout(function() {
+                    alerts.forEach(alert => {
+                        alert.style.opacity = '0';
+                        alert.style.transition = 'opacity 0.5s ease';
+                        setTimeout(() => {
+                            alert.remove();
+                        }, 500);
+                    });
+                }, 5000);
+            }
+
+            // Add smooth scroll behavior
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+        });
+    </script>
+    {% block scripts %}{% endblock %}
 </body>
 </html>

@@ -13,25 +13,33 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        # Mặc định người dùng đăng ký không phải là admin
+        is_admin = False
+        
         db = get_db()
         error = None
 
         if not username:
-            error = 'Username is required.'
+            error = 'Tên đăng nhập là bắt buộc.'
         elif not password:
-            error = 'Password is required.'
+            error = 'Mật khẩu là bắt buộc.'
+        elif len(username) < 3:
+            error = 'Tên đăng nhập phải có ít nhất 3 ký tự.'
+        elif len(password) < 8:
+            error = 'Mật khẩu phải có ít nhất 8 ký tự.'
+        elif db.execute(
+            'SELECT id FROM user WHERE username = ?', (username,)
+        ).fetchone() is not None:
+            error = f"Người dùng {username} đã tồn tại."
 
         if error is None:
-            try:
-                db.execute(
-                    "INSERT INTO user (username, password, is_admin) VALUES (?, ?, ?)",
-                    (username, generate_password_hash(password), 0),  # Tạo tài khoản không phải admin
-                )
-                db.commit()
-            except db.IntegrityError:
-                error = f"User {username} is already registered."
-            else:
-                return redirect(url_for("auth.login"))
+            db.execute(
+                'INSERT INTO user (username, password, is_admin) VALUES (?, ?, ?)',
+                (username, generate_password_hash(password), is_admin)
+            )
+            db.commit()
+            flash(f'Tài khoản "{username}" đã được tạo thành công!')
+            return redirect(url_for('auth.login'))
 
         flash(error)
 
@@ -49,18 +57,21 @@ def login():
         ).fetchone()
 
         if user is None:
-            error = 'Incorrect username.'
-        elif user['is_blocked']:
-            error = 'Your account has been blocked.'
+            error = 'Tên đăng nhập không chính xác.'
         elif not check_password_hash(user['password'], password):
-            error = 'Incorrect password.'
+            error = 'Mật khẩu không chính xác.'
+        elif user['is_blocked']:
+            error = 'Tài khoản này đã bị chặn. Vui lòng liên hệ quản trị viên.'
 
         if error is None:
             session.clear()
             session['user_id'] = user['id']
+            
+            # Đăng nhập thành công, hiển thị thông báo và chuyển hướng
+            flash(f'Chào mừng, {username}!')
             if user['is_admin']:
-                return redirect(url_for('blog.admin'))
-            return redirect(url_for('index'))
+                flash('Bạn đã đăng nhập với tư cách quản trị viên.')
+            return redirect(url_for('blog.blog_index'))
 
         flash(error)
 

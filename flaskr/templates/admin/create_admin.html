@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 
-{% block title %}Đăng ký{% endblock %}
+{% block title %}Tạo Tài Khoản Quản Trị{% endblock %}
 
 {% block header %}
-  <h1><i class="fas fa-user-plus"></i> Đăng ký tài khoản</h1>
-  <p class="text-light">Tạo tài khoản mới để tham gia cộng đồng của chúng tôi</p>
+  <h1><i class="fas fa-user-shield"></i> Tạo Tài Khoản Quản Trị Mới</h1>
+  <p class="text-light">Tạo tài khoản quản trị viên mới cho hệ thống</p>
 {% endblock %}
 
 {% block content %}
@@ -12,18 +12,18 @@
   <div class="auth-container fade-in">
     <div class="auth-card card">
       <div class="auth-header">
-        <i class="fas fa-user-plus auth-icon"></i>
-        <h2>Tạo tài khoản mới</h2>
-        <p class="text-light">Vui lòng điền thông tin đăng ký</p>
+        <i class="fas fa-user-shield auth-icon"></i>
+        <h2>Tạo tài khoản quản trị viên mới</h2>
+        <p class="text-light">Vui lòng điền thông tin tài khoản</p>
       </div>
       
-      <form method="post" class="form" id="registerForm">
+      <form method="post" class="form" id="createAdminForm">
         <div class="form-group">
           <label for="username">
             <i class="fas fa-user"></i> Tên đăng nhập
           </label>
           <input name="username" id="username" class="form-control" required
-                 placeholder="Chọn tên đăng nhập" autocomplete="username"
+                 placeholder="Nhập tên đăng nhập" autocomplete="username"
                  value="{{ request.form.username or '' }}">
           <div class="form-hint">Tên đăng nhập phải có ít nhất 3 ký tự</div>
         </div>
@@ -48,19 +48,20 @@
           </label>
           <div class="password-input-container">
             <input type="password" name="confirm-password" id="confirm-password" class="form-control" 
-                   required placeholder="Nhập lại mật khẩu của bạn" autocomplete="new-password">
+                   required placeholder="Nhập lại mật khẩu" autocomplete="new-password">
             <button type="button" class="password-toggle" onclick="togglePassword('confirm-password', 'confirm-password-toggle-icon')">
               <i class="fas fa-eye" id="confirm-password-toggle-icon"></i>
             </button>
           </div>
         </div>
         
-        <button type="submit" class="btn primary full-width">
-          <i class="fas fa-user-plus"></i> Đăng ký
-        </button>
-        
-        <div class="auth-links">
-          <p>Đã có tài khoản? <a href="{{ url_for('auth.login') }}" class="link">Đăng nhập ngay</a></p>
+        <div class="form-buttons">
+          <a href="{{ url_for('blog.admin') }}" class="btn outline">
+            <i class="fas fa-arrow-left"></i> Quay lại
+          </a>
+          <button type="submit" class="btn primary">
+            <i class="fas fa-user-plus"></i> Tạo tài khoản
+          </button>
         </div>
       </form>
     </div>
@@ -83,7 +84,7 @@ function togglePassword(inputId, iconId) {
   }
 }
 
-document.getElementById('registerForm').addEventListener('submit', function(event) {
+document.getElementById('createAdminForm').addEventListener('submit', function(event) {
   const password = document.getElementById('password').value;
   const confirmPassword = document.getElementById('confirm-password').value;
   const username = document.getElementById('username').value;
@@ -110,4 +111,4 @@ document.getElementById('registerForm').addEventListener('submit', function(even
   }
 });
 </script>
-{% endblock %}
+{% endblock %} 

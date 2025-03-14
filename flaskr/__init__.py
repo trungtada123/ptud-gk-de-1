@@ -1,6 +1,7 @@
 # flask-tiny-app/flaskr/__init__.py
 import os
 from flask import Flask, render_template, request, redirect, url_for
+import datetime
 
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
@@ -27,6 +28,13 @@ def create_app(test_config=None):
 
     from . import blog
     app.register_blueprint(blog.bp)
+    
+    # Thêm các hàm tiện ích vào ngữ cảnh mẫu
+    @app.context_processor
+    def inject_utilities():
+        def get_year():
+            return datetime.datetime.now().year
+        return {'get_year': get_year}
 
     @app.route('/')
     def index():

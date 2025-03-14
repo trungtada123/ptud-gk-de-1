@@ -1,51 +1,163 @@
 {% extends 'base.html' %}
 {% block title %}Tạo Bài Viết Mới{% endblock %}
 
+{% block extra_css %}
+<style>
+  .content-section {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .section-icon {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    font-size: 4rem;
+    color: rgba(0,0,0,0.03);
+    z-index: 0;
+  }
+  
+  .section-header {
+    position: relative;
+    z-index: 1;
+    margin-bottom: 1.5rem;
+  }
+  
+  .image-input-group, .link-input-group {
+    background-color: var(--light-gray);
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  .image-preview {
+    flex-grow: 1;
+    margin: 0 1rem;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .remove-btn {
+    background-color: var(--danger-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  
+  .remove-btn:hover {
+    background-color: #c0392b;
+    transform: scale(1.1);
+  }
+  
+  .add-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--secondary-color);
+  }
+  
+  .add-btn i {
+    margin-right: 5px;
+  }
+  
+  #title {
+    font-size: 1.2rem;
+    font-weight: 500;
+    padding: 0.8rem 1rem;
+  }
+</style>
+{% endblock %}
+
 {% block header %}
-    <h1>Tạo Bài Viết Mới</h1>
+  <h1><i class="fas fa-edit"></i> Tạo Bài Viết Mới</h1>
+  <p class="text-light">Chia sẻ kiến thức, hình ảnh hoặc liên kết với cộng đồng</p>
 {% endblock %}
 
 {% block content %}
-<form method="post" class="form" enctype="multipart/form-data" id="createPostForm">
-    <div class="form-group">
+<div class="card fade-in">
+  <div class="card-body">
+    <form method="post" class="form" enctype="multipart/form-data" id="createPostForm">
+      <div class="form-group">
         <label for="title">Tiêu đề</label>
-        <input name="title" id="title" value="{{ request.form.title or '' }}" required>
-    </div>
-    
-    <!-- Nội dung văn bản -->
-    <div class="form-group content-section">
-        <h3>Nội dung văn bản</h3>
-        <textarea name="text_content" id="text_content" rows="5" placeholder="Nhập nội dung văn bản của bạn ở đây...">{{ request.form.text_content or '' }}</textarea>
-    </div>
-    
-    <!-- Hình ảnh -->
-    <div class="form-group content-section">
-        <h3>Hình ảnh</h3>
+        <input name="title" id="title" class="form-control" value="{{ request.form.title or '' }}" required placeholder="Nhập tiêu đề bài viết...">
+      </div>
+      
+      <!-- Nội dung văn bản -->
+      <div class="content-section">
+        <div class="section-icon"><i class="fas fa-font"></i></div>
+        <div class="section-header">
+          <h3><i class="fas fa-paragraph"></i> Nội dung văn bản</h3>
+          <p class="text-light">Viết nội dung chi tiết cho bài viết của bạn</p>
+        </div>
+        <textarea name="text_content" id="text_content" class="form-control" rows="5" placeholder="Nhập nội dung văn bản của bạn ở đây...">{{ request.form.text_content or '' }}</textarea>
+      </div>
+      
+      <!-- Hình ảnh -->
+      <div class="content-section">
+        <div class="section-icon"><i class="fas fa-images"></i></div>
+        <div class="section-header">
+          <h3><i class="fas fa-image"></i> Hình ảnh</h3>
+          <p class="text-light">Thêm hình ảnh vào bài viết của bạn</p>
+        </div>
         <div id="image-inputs">
-            <div class="image-input-group">
-                <input type="file" name="images[]" class="image-input" accept="image/*" onchange="previewImage(this)">
-                <div class="image-preview"></div>
-                <button type="button" class="btn remove-btn" onclick="removeImageInput(this)" style="display:none;">Xóa</button>
-            </div>
+          <div class="image-input-group">
+            <input type="file" name="images[]" class="image-input" accept="image/*" onchange="previewImage(this)">
+            <div class="image-preview"></div>
+            <button type="button" class="remove-btn" onclick="removeImageInput(this)" style="display:none;">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
         </div>
-        <button type="button" class="btn add-btn" onclick="addImageInput()">+ Thêm hình ảnh</button>
-    </div>
-    
-    <!-- Liên kết -->
-    <div class="form-group content-section">
-        <h3>Liên kết</h3>
+        <button type="button" class="btn add-btn" onclick="addImageInput()">
+          <i class="fas fa-plus"></i> Thêm hình ảnh
+        </button>
+      </div>
+      
+      <!-- Liên kết -->
+      <div class="content-section">
+        <div class="section-icon"><i class="fas fa-link"></i></div>
+        <div class="section-header">
+          <h3><i class="fas fa-external-link-alt"></i> Liên kết</h3>
+          <p class="text-light">Thêm các liên kết hữu ích</p>
+        </div>
         <div id="link-inputs">
-            <div class="link-input-group">
-                <input type="url" name="links[]" class="link-input" placeholder="https://example.com">
-                <button type="button" class="btn remove-btn" onclick="removeLinkInput(this)" style="display:none;">Xóa</button>
-            </div>
+          <div class="link-input-group">
+            <input type="url" name="links[]" class="form-control link-input" placeholder="https://example.com">
+            <button type="button" class="remove-btn" onclick="removeLinkInput(this)" style="display:none;">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
         </div>
-        <button type="button" class="btn add-btn" onclick="addLinkInput()">+ Thêm liên kết</button>
-    </div>
-    
-    <input type="submit" value="Đăng bài" class="btn">
-</form>
+        <button type="button" class="btn add-btn" onclick="addLinkInput()">
+          <i class="fas fa-plus"></i> Thêm liên kết
+        </button>
+      </div>
+      
+      <div class="d-flex justify-between mt-3">
+        <a href="{{ url_for('blog.blog_index') }}" class="btn outline">
+          <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+        <input type="submit" value="Đăng bài" class="btn primary lg">
+      </div>
+    </form>
+  </div>
+</div>
 
+{% block scripts %}
 <script>
 // Xử lý hình ảnh
 function addImageInput() {
@@ -55,7 +167,9 @@ function addImageInput() {
     newGroup.innerHTML = `
         <input type="file" name="images[]" class="image-input" accept="image/*" onchange="previewImage(this)">
         <div class="image-preview"></div>
-        <button type="button" class="btn remove-btn" onclick="removeImageInput(this)">Xóa</button>
+        <button type="button" class="remove-btn" onclick="removeImageInput(this)">
+          <i class="fas fa-times"></i>
+        </button>
     `;
     container.appendChild(newGroup);
 }
@@ -73,7 +187,7 @@ function previewImage(input) {
         const reader = new FileReader();
         reader.onload = function(e) {
             preview.innerHTML = `<img src="${e.target.result}" style="max-width: 200px; max-height: 150px;">`;
-            removeBtn.style.display = 'inline-block';
+            removeBtn.style.display = 'flex';
         }
         reader.readAsDataURL(input.files[0]);
     }
@@ -85,8 +199,10 @@ function addLinkInput() {
     const newGroup = document.createElement('div');
     newGroup.className = 'link-input-group';
     newGroup.innerHTML = `
-        <input type="url" name="links[]" class="link-input" placeholder="https://example.com">
-        <button type="button" class="btn remove-btn" onclick="removeLinkInput(this)">Xóa</button>
+        <input type="url" name="links[]" class="form-control link-input" placeholder="https://example.com">
+        <button type="button" class="remove-btn" onclick="removeLinkInput(this)">
+          <i class="fas fa-times"></i>
+        </button>
     `;
     container.appendChild(newGroup);
 }
@@ -135,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
     firstImage.addEventListener('change', function() {
         const removeBtn = this.parentElement.querySelector('.remove-btn');
         if (this.files && this.files[0]) {
-            removeBtn.style.display = 'inline-block';
+            removeBtn.style.display = 'flex';
         }
     });
     
@@ -143,37 +259,13 @@ document.addEventListener('DOMContentLoaded', function() {
     firstLink.addEventListener('input', function() {
         const removeBtn = this.parentElement.querySelector('.remove-btn');
         if (this.value.trim()) {
-            removeBtn.style.display = 'inline-block';
+            removeBtn.style.display = 'flex';
         } else {
             removeBtn.style.display = 'none';
         }
     });
 });
 </script>
+{% endblock %}
 
-<style>
-.content-section {
-    border: 1px solid #ddd;
-    padding: 15px;
-    margin-bottom: 20px;
-    border-radius: 5px;
-}
-.image-input-group, .link-input-group {
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-}
-.image-preview {
-    margin: 0 10px;
-}
-.remove-btn {
-    background-color: #f44336;
-    color: white;
-    margin-left: 10px;
-}
-.add-btn {
-    background-color: #4CAF50;
-    color: white;
-}
-</style>
 {% endblock %}

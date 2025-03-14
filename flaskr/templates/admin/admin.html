@@ -1,0 +1,301 @@
+{% extends 'base.html' %}
+
+{% block title %}Bảng Quản Trị Admin{% endblock %}
+
+{% block header %}
+  <h1><i class="fas fa-user-shield"></i> Bảng Quản Trị</h1>
+  <p class="text-light">Quản lý người dùng và bài viết</p>
+{% endblock %}
+
+{% block content %}
+<div class="container fade-in">
+  <div class="admin-dashboard">
+    <!-- Thống kê tổng quan -->
+    <div class="admin-stats-container">
+      <div class="admin-stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-content">
+          <h3>Tổng Người Dùng</h3>
+          <p class="stat-value">{{ user_count }}</p>
+        </div>
+      </div>
+      
+      <div class="admin-stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-file-alt"></i>
+        </div>
+        <div class="stat-content">
+          <h3>Tổng Bài Viết</h3>
+          <p class="stat-value">{{ post_count }}</p>
+        </div>
+      </div>
+      
+      <div class="admin-stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-user-slash"></i>
+        </div>
+        <div class="stat-content">
+          <h3>Người Dùng Bị Chặn</h3>
+          <p class="stat-value">{{ blocked_count }}</p>
+        </div>
+      </div>
+      
+      <div class="admin-stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-shield-alt"></i>
+        </div>
+        <div class="stat-content">
+          <h3>Quản Trị Viên</h3>
+          <p class="stat-value">{{ admin_count }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quản lý chính -->
+    <div class="admin-sections">
+      <!-- Quản lý người dùng -->
+      <div class="admin-section card">
+        <div class="card-header">
+          <h2><i class="fas fa-users"></i> Quản Lý Người Dùng</h2>
+        </div>
+        <div class="card-body">
+          <p>Quản lý tài khoản người dùng, cấp quyền hoặc chặn người dùng</p>
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Tên người dùng</th>
+                <th>Vai trò</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for user in users %}
+              <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.username }}</td>
+                <td>
+                  <span class="badge badge-{{ 'primary' if user.is_admin else 'secondary' }}">
+                    {{ 'Admin' if user.is_admin else 'Thành viên' }}
+                  </span>
+                </td>
+                <td>
+                  <span class="badge badge-{{ 'danger' if user.is_blocked else 'success' }}">
+                    {{ 'Bị chặn' if user.is_blocked else 'Hoạt động' }}
+                  </span>
+                </td>
+                <td class="action-buttons">
+                  {% if not user.is_blocked and user.id != g.user.id and not (user.is_admin and g.user.is_admin) %}
+                    <a href="{{ url_for('blog.block_user', id=user.id) }}" class="btn sm danger" 
+                      onclick="return confirm('Bạn có chắc chắn muốn chặn người dùng này?')">
+                      <i class="fas fa-ban"></i> Chặn
+                    </a>
+                  {% elif user.is_blocked %}
+                    <a href="{{ url_for('blog.unblock_user', id=user.id) }}" class="btn sm success">
+                      <i class="fas fa-check-circle"></i> Bỏ chặn
+                    </a>
+                  {% else %}
+                    <span class="text-light">Không thể chặn</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Quản lý bài viết -->
+      <div class="admin-section card">
+        <div class="card-header">
+          <h2><i class="fas fa-tasks"></i> Quản Lý Hệ Thống</h2>
+        </div>
+        <div class="card-body">
+          <div class="admin-actions">
+            <a href="{{ url_for('blog.admin_posts') }}" class="admin-action-card">
+              <div class="action-icon">
+                <i class="fas fa-file-alt"></i>
+              </div>
+              <div class="action-content">
+                <h3>Quản Lý Bài Viết</h3>
+                <p>Xem và quản lý tất cả bài viết trong hệ thống</p>
+              </div>
+            </a>
+            
+            <a href="{{ url_for('blog.admin_my_posts') }}" class="admin-action-card">
+              <div class="action-icon">
+                <i class="fas fa-clipboard-list"></i>
+              </div>
+              <div class="action-content">
+                <h3>Bài Viết Của Tôi</h3>
+                <p>Quản lý bài viết của riêng bạn</p>
+              </div>
+            </a>
+            
+            <a href="{{ url_for('blog.create_admin') }}" class="admin-action-card">
+              <div class="action-icon">
+                <i class="fas fa-user-shield"></i>
+              </div>
+              <div class="action-content">
+                <h3>Tạo Quản Trị Viên</h3>
+                <p>Tạo tài khoản quản trị viên mới cho hệ thống</p>
+              </div>
+            </a>
+            
+            <a href="{{ url_for('blog.create') }}" class="admin-action-card">
+              <div class="action-icon">
+                <i class="fas fa-plus-circle"></i>
+              </div>
+              <div class="action-content">
+                <h3>Tạo Bài Viết</h3>
+                <p>Đăng bài viết mới lên hệ thống</p>
+              </div>
+            </a>
+            
+            <a href="{{ url_for('blog.blog_index') }}" class="admin-action-card">
+              <div class="action-icon">
+                <i class="fas fa-home"></i>
+              </div>
+              <div class="action-content">
+                <h3>Trang Chủ</h3>
+                <p>Quay lại trang chủ blog</p>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .admin-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .admin-stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+  }
+  
+  .admin-stat-card {
+    background-color: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: var(--box-shadow);
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s ease;
+  }
+  
+  .admin-stat-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .stat-icon {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-right: 1rem;
+    background-color: rgba(var(--primary-color-rgb), 0.1);
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+  }
+  
+  .stat-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--dark-color);
+    margin: 0;
+  }
+  
+  .admin-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+  }
+  
+  .admin-table th, .admin-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .admin-table th {
+    background-color: var(--light-gray);
+    font-weight: 600;
+  }
+  
+  .admin-table tr:hover {
+    background-color: var(--hover-color);
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .admin-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .admin-action-card {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+    background-color: var(--light-gray);
+    border-radius: var(--border-radius);
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: var(--dark-color);
+  }
+  
+  .admin-action-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--box-shadow);
+    background-color: white;
+  }
+  
+  .action-icon {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-right: 1rem;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(var(--primary-color-rgb), 0.1);
+    border-radius: 50%;
+  }
+  
+  .action-content h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.2rem;
+  }
+  
+  .action-content p {
+    margin: 0;
+    color: var(--text-light);
+    font-size: 0.9rem;
+  }
+</style>
+{% endblock %} 

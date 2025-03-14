@@ -1,0 +1,324 @@
+{% extends 'base.html' %}
+
+{% block title %}Quản Lý Bài Viết{% endblock %}
+
+{% block header %}
+  <h1><i class="fas fa-tasks"></i> Quản Lý Tất Cả Bài Viết</h1>
+  <p class="text-light">Xem và quản lý tất cả bài viết trong hệ thống</p>
+{% endblock %}
+
+{% block content %}
+<div class="container fade-in">
+  <div class="action-bar">
+    <a href="{{ url_for('blog.admin') }}" class="btn outline">
+      <i class="fas fa-arrow-left"></i> Quay lại bảng quản trị
+    </a>
+    <a href="{{ url_for('blog.create') }}" class="btn primary">
+      <i class="fas fa-plus"></i> Tạo bài viết mới
+    </a>
+  </div>
+
+  {% if posts %}
+  <div class="admin-posts">
+    <div class="filter-controls card">
+      <div class="card-header">
+        <h3><i class="fas fa-filter"></i> Lọc và Tìm Kiếm</h3>
+      </div>
+      <div class="card-body">
+        <form action="{{ url_for('blog.admin_posts') }}" method="get" class="filter-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="search">Từ khóa</label>
+              <input type="text" name="search" id="search" class="form-control" placeholder="Tìm theo tiêu đề..." value="{{ request.args.get('search', '') }}">
+            </div>
+            
+            <div class="form-group">
+              <label for="author">Tác giả</label>
+              <input type="text" name="author" id="author" class="form-control" placeholder="Tên tác giả..." value="{{ request.args.get('author', '') }}">
+            </div>
+            
+            <div class="form-group">
+              <label for="post_type">Loại bài viết</label>
+              <select name="post_type" id="post_type" class="form-control">
+                <option value="" {% if not request.args.get('post_type') %}selected{% endif %}>Tất cả</option>
+                <option value="text" {% if request.args.get('post_type') == 'text' %}selected{% endif %}>Văn bản</option>
+                <option value="image" {% if request.args.get('post_type') == 'image' %}selected{% endif %}>Hình ảnh</option>
+                <option value="link" {% if request.args.get('post_type') == 'link' %}selected{% endif %}>Liên kết</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-buttons">
+            <button type="submit" class="btn primary">
+              <i class="fas fa-search"></i> Tìm kiếm
+            </button>
+            <a href="{{ url_for('blog.admin_posts') }}" class="btn outline">
+              <i class="fas fa-sync-alt"></i> Đặt lại
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <form method="post" action="{{ url_for('blog.delete_multiple_posts') }}" onsubmit="return confirmDelete()">
+      <div class="card bulk-actions">
+        <div class="card-body d-flex justify-between align-center">
+          <div>
+            <h3><i class="fas fa-tasks"></i> Hành động hàng loạt</h3>
+            <p class="text-light">Chọn các bài viết và thực hiện hành động</p>
+          </div>
+          <button type="submit" class="btn danger">
+            <i class="fas fa-trash-alt"></i> Xóa đã chọn
+          </button>
+        </div>
+      </div>
+      
+      <div class="posts-table-container">
+        <table class="admin-table posts-table">
+          <thead>
+            <tr>
+              <th style="width: 40px">
+                <input type="checkbox" class="form-check-input" id="select-all" onclick="toggleSelectAll()">
+              </th>
+              <th style="width: 60px">ID</th>
+              <th>Tiêu đề</th>
+              <th style="width: 120px">Loại</th>
+              <th style="width: 150px">Tác giả</th>
+              <th style="width: 180px">Ngày tạo</th>
+              <th style="width: 120px">Hành động</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for post in posts %}
+            <tr>
+              <td>
+                <input type="checkbox" name="post_ids" value="{{ post.id }}" class="form-check-input post-checkbox">
+              </td>
+              <td>{{ post.id }}</td>
+              <td class="post-title-cell">
+                {{ post.title }}
+                <div class="post-preview">
+                  {% if post.post_type == 'text' %}
+                    <p>{{ post.text_content|truncate(100) }}</p>
+                  {% elif post.post_type == 'image' %}
+                    <div class="post-images-preview">
+                      {% for image in post.images[:2] %}
+                        <div class="post-image-thumbnail">
+                          <img src="{{ url_for('static', filename='uploads/' + image) }}" alt="Post image">
+                        </div>
+                      {% endfor %}
+                      {% if post.images|length > 2 %}
+                        <div class="more-indicator">+{{ post.images|length - 2 }}</div>
+                      {% endif %}
+                    </div>
+                  {% elif post.post_type == 'link' %}
+                    <div class="post-links-preview">
+                      {% for link in post.links[:2] %}
+                        <a href="{{ link }}" target="_blank" class="post-link">
+                          <i class="fas fa-external-link-alt"></i> {{ link|truncate(40) }}
+                        </a>
+                      {% endfor %}
+                      {% if post.links|length > 2 %}
+                        <div class="more-indicator">+{{ post.links|length - 2 }} liên kết</div>
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                </div>
+              </td>
+              <td>
+                <span class="badge badge-{{ post.post_type }}">{{ post.post_type }}</span>
+              </td>
+              <td>{{ post.author_name }}</td>
+              <td>{{ post.created.strftime('%d-%m-%Y %H:%M') }}</td>
+              <td class="action-buttons">
+                <a href="{{ url_for('blog.update', id=post.id) }}" class="btn sm outline">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <a href="{{ url_for('blog.delete_post', id=post.id) }}" class="btn sm danger" 
+                   onclick="return confirm('Bạn có chắc chắn muốn xóa bài viết này?')">
+                  <i class="fas fa-trash-alt"></i>
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </form>
+    
+    {% if pages > 1 %}
+    <div class="pagination-container">
+      <div class="pagination">
+        {% if page > 1 %}
+          <a class="btn outline pagination-btn" href="{{ url_for('blog.admin_posts', page=page-1, search=request.args.get('search', ''), author=request.args.get('author', ''), post_type=request.args.get('post_type', '')) }}">
+            <i class="fas fa-chevron-left"></i> Trang trước
+          </a>
+        {% endif %}
+        
+        {% for p in range(1, pages + 1) %}
+          <a class="btn outline pagination-btn {% if p == page %}active{% endif %}" 
+             href="{{ url_for('blog.admin_posts', page=p, search=request.args.get('search', ''), author=request.args.get('author', ''), post_type=request.args.get('post_type', '')) }}">
+            {{ p }}
+          </a>
+        {% endfor %}
+        
+        {% if page < pages %}
+          <a class="btn outline pagination-btn" href="{{ url_for('blog.admin_posts', page=page+1, search=request.args.get('search', ''), author=request.args.get('author', ''), post_type=request.args.get('post_type', '')) }}">
+            Trang sau <i class="fas fa-chevron-right"></i>
+          </a>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-state-icon">
+      <i class="fas fa-file-alt"></i>
+    </div>
+    <h2>Không có bài viết nào</h2>
+    <p>Chưa có bài viết nào trong hệ thống hoặc không có bài viết nào khớp với tiêu chí tìm kiếm của bạn.</p>
+    <a href="{{ url_for('blog.create') }}" class="btn primary">
+      <i class="fas fa-plus"></i> Tạo bài viết mới
+    </a>
+  </div>
+  {% endif %}
+</div>
+
+<style>
+  .filter-controls {
+    margin-bottom: 1.5rem;
+  }
+  
+  .filter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .form-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .form-row .form-group {
+    flex: 1;
+    min-width: 200px;
+  }
+  
+  .form-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+  }
+  
+  .posts-table-container {
+    overflow-x: auto;
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    margin-bottom: 1.5rem;
+  }
+  
+  .posts-table {
+    width: 100%;
+  }
+  
+  .post-title-cell {
+    position: relative;
+  }
+  
+  .post-preview {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 100%;
+    width: 300px;
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 1rem;
+    z-index: 10;
+  }
+  
+  .post-title-cell:hover .post-preview {
+    display: block;
+  }
+  
+  .post-images-preview, .post-links-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .post-image-thumbnail {
+    width: 80px;
+    height: 60px;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+  }
+  
+  .post-image-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .post-link {
+    display: block;
+    padding: 0.25rem 0;
+    color: var(--primary-color);
+    text-decoration: none;
+  }
+  
+  .more-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 60px;
+    background-color: var(--light-gray);
+    border-radius: var(--border-radius);
+    font-weight: bold;
+    color: var(--dark-color);
+  }
+  
+  .bulk-actions {
+    margin-bottom: 1rem;
+  }
+  
+  .badge-text {
+    background-color: #3498db;
+  }
+  
+  .badge-image {
+    background-color: #9b59b6;
+  }
+  
+  .badge-link {
+    background-color: #2ecc71;
+  }
+</style>
+
+<script>
+function toggleSelectAll() {
+  const selectAllCheckbox = document.getElementById('select-all');
+  const postCheckboxes = document.querySelectorAll('.post-checkbox');
+  
+  postCheckboxes.forEach(checkbox => {
+    checkbox.checked = selectAllCheckbox.checked;
+  });
+}
+
+function confirmDelete() {
+  const checkboxes = document.querySelectorAll('input[name="post_ids"]:checked');
+  if (checkboxes.length === 0) {
+    alert('Vui lòng chọn ít nhất một bài viết để xóa');
+    return false;
+  }
+  return confirm(`Bạn có chắc chắn muốn xóa ${checkboxes.length} bài viết đã chọn?`);
+}
+</script>
+{% endblock %} 

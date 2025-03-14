@@ -1,20 +1,76 @@
 {% extends 'base.html' %}
-{% block title %}Đăng Nhập{% endblock %}
+
+{% block title %}Đăng nhập{% endblock %}
 
 {% block header %}
-    <h1>Đăng Nhập</h1>
+  <h1><i class="fas fa-sign-in-alt"></i> Đăng nhập</h1>
+  <p class="text-light">Đăng nhập vào tài khoản của bạn để bắt đầu chia sẻ nội dung</p>
 {% endblock %}
 
 {% block content %}
-<form method="post" class="form">
-    <div class="form-group">
-        <label for="username">Tên người dùng</label>
-        <input name="username" id="username" required>
+<div class="container-sm">
+  <div class="auth-container fade-in">
+    <div class="auth-card card">
+      <div class="auth-header">
+        <i class="fas fa-user-circle auth-icon"></i>
+        <h2>Chào mừng trở lại</h2>
+        <p class="text-light">Vui lòng nhập thông tin đăng nhập của bạn</p>
+      </div>
+      
+      <form method="post" class="form">
+        <div class="form-group">
+          <label for="username">
+            <i class="fas fa-user"></i> Tên đăng nhập
+          </label>
+          <input name="username" id="username" class="form-control" required
+                 placeholder="Nhập tên đăng nhập của bạn" autocomplete="username"
+                 value="{{ request.form.username or '' }}">
+        </div>
+        
+        <div class="form-group">
+          <label for="password">
+            <i class="fas fa-lock"></i> Mật khẩu
+          </label>
+          <div class="password-input-container">
+            <input type="password" name="password" id="password" class="form-control" 
+                   required placeholder="Nhập mật khẩu của bạn" autocomplete="current-password">
+            <button type="button" class="password-toggle" onclick="togglePassword()">
+              <i class="fas fa-eye" id="password-toggle-icon"></i>
+            </button>
+          </div>
+        </div>
+        
+        <div class="form-check">
+          <input type="checkbox" name="remember" id="remember" class="form-check-input">
+          <label for="remember" class="form-check-label">Ghi nhớ đăng nhập</label>
+        </div>
+        
+        <button type="submit" class="btn primary full-width">
+          <i class="fas fa-sign-in-alt"></i> Đăng nhập
+        </button>
+        
+        <div class="auth-links">
+          <p>Chưa có tài khoản? <a href="{{ url_for('auth.register') }}" class="link">Đăng ký ngay</a></p>
+        </div>
+      </form>
     </div>
-    <div class="form-group">
-        <label for="password">Mật khẩu</label>
-        <input type="password" name="password" id="password" required>
-    </div>
-    <input type="submit" value="Đăng Nhập" class="btn">
-</form>
+  </div>
+</div>
+
+<script>
+function togglePassword() {
+  const passwordInput = document.getElementById('password');
+  const icon = document.getElementById('password-toggle-icon');
+  
+  if (passwordInput.type === 'password') {
+    passwordInput.type = 'text';
+    icon.classList.remove('fa-eye');
+    icon.classList.add('fa-eye-slash');
+  } else {
+    passwordInput.type = 'password';
+    icon.classList.remove('fa-eye-slash');
+    icon.classList.add('fa-eye');
+  }
+}
+</script>
 {% endblock %}

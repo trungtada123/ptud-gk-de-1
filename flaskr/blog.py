@@ -342,6 +342,46 @@ def reset_password(user_id):
     flash(f'Mật khẩu mới: {new_password}')
     return redirect(url_for('blog.admin'))
 
+@bp.route('/admin/create_admin', methods=('GET', 'POST'))
+@login_required
+def create_admin():
+    # Kiểm tra xem người dùng có phải là admin không
+    if not g.user['is_admin']:
+        flash('Bạn không có quyền thực hiện chức năng này.')
+        return redirect(url_for('blog.blog_index'))
+    
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        db = get_db()
+        error = None
+
+        if not username:
+            error = 'Tên đăng nhập là bắt buộc.'
+        elif not password:
+            error = 'Mật khẩu là bắt buộc.'
+        elif len(username) < 3:
+            error = 'Tên đăng nhập phải có ít nhất 3 ký tự.'
+        elif len(password) < 8:
+            error = 'Mật khẩu phải có ít nhất 8 ký tự.'
+        elif db.execute(
+            'SELECT id FROM user WHERE username = ?', (username,)
+        ).fetchone() is not None:
+            error = f"Người dùng {username} đã tồn tại."
+
+        if error is None:
+            db.execute(
+                'INSERT INTO user (username, password, is_admin) VALUES (?, ?, ?)',
+                (username, generate_password_hash(password), True)
+            )
+            db.commit()
+            flash(f'Tài khoản quản trị viên "{username}" đã được tạo thành công!')
+            return redirect(url_for('blog.admin'))
+
+        flash(error)
+
+    return render_template('admin/create_admin.html')
+
 def get_post(id, check_author=True):
     db = get_db()
     # Lấy thông tin cơ bản của bài viết
