@@ -20,7 +20,7 @@
    ```
 2. Di chuyển đến thư mục chính
    ```
-    cd flask-tiny-app
+    cd ptud-gk-de-1
    ```
 3. Chạy script cài đặt:
    ```
