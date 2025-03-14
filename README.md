@@ -5,8 +5,8 @@
 # Ứng dụng Flask Blog
 
 Ứng dụng blog đơn giản được xây dựng bằng Python Flask với các tính năng:
-- Đăng bài viết với văn bản, hình ảnh và liên kết
-- Theo dõi bài viết yêu thích
+- Đăng bài viết với văn bản, hình ảnh và liên kết ( Mỗi post là 1 thẻ )
+- Theo dõi bài viết yêu thích ( Bài viết theo dõi được đưa vào trang khác )
 - Phân quyền admin và người dùng thường
 - Quản lý người dùng và bài viết
 
@@ -24,7 +24,7 @@
    ```
 3. Chạy script cài đặt:
    ```
-    .\setup.bat
+    .\setup-new.bat
    ```
    Script này sẽ:
    - Tạo môi trường ảo Python
@@ -40,7 +40,7 @@
 
 5. Chạy ứng dụng:
    ```
-   .\run.bat
+   .\run-new.bat
    ```
 ### Sử dụng ứng dụng
 
